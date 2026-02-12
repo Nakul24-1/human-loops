@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Human Loops — Minimal Hero Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="bg">
+    <svg class="loop-svg" viewBox="0 0 1400 900" aria-hidden="true">
+      <defs>
+        <linearGradient id="loopGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#64e8cb" />
+          <stop offset="100%" stop-color="#7ea9ff" />
+        </linearGradient>
+        <marker id="flowArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#7ea9ff" />
+        </marker>
+      </defs>
+
+      <g class="grid-lines">
+        <path d="M80 180 C420 120 980 120 1320 180" />
+        <path d="M40 320 C360 260 1040 260 1360 330" />
+        <path d="M100 470 C440 420 980 420 1320 490" />
+        <path d="M70 620 C420 570 980 570 1310 650" />
+        <path d="M200 760 C560 710 940 710 1220 790" />
+      </g>
+
+      <path id="track" class="track" d="M 170 272 C 470 95, 930 95, 1230 272" />
+
+      <g class="node" transform="translate(120 212)">
+        <rect width="130" height="76" rx="14"></rect>
+        <text x="65" y="46" text-anchor="middle">Incoming</text>
+      </g>
+
+      <g class="node human" transform="translate(639 118)">
+        <rect width="122" height="64" rx="14"></rect>
+        <text x="61" y="33" text-anchor="middle">Human QA</text>
+        <text x="61" y="50" text-anchor="middle">Review</text>
+      </g>
+
+      <g class="node" transform="translate(1150 212)">
+        <rect width="130" height="76" rx="14"></rect>
+        <text x="65" y="46" text-anchor="middle">Delivered</text>
+      </g>
+
+      <g id="flagGroup" transform="translate(782 178)">
+        <rect class="flag-badge" width="74" height="30" rx="10"></rect>
+        <text id="flagText" x="37" y="20" text-anchor="middle">⚠ Flag</text>
+      </g>
+
+      <rect class="pill p1" width="18" height="10" rx="5"></rect>
+      <rect class="pill p2" width="18" height="10" rx="5"></rect>
+      <rect class="pill p3" width="18" height="10" rx="5"></rect>
+      <rect class="pill p4" width="18" height="10" rx="5"></rect>
+    </svg>
+  </div>
+
+  <main class="hero">
+    <img src="./logo.svg" alt="Human Loops logo" class="logo" />
+    <p class="eyebrow">Human in the Loop Service Provider</p>
+    <h1>Human-in-the-Loop Operations for AI at Scale</h1>
+    <p class="subcopy">We QA AI outputs, filter datasets, and train models—so your accuracy improves without slowing your team down.</p>
+
+    <div class="cta-row">
+      <a href="https://calendly.com/shloak/introductory-call?month=2026-02" class="btn primary" target="_blank" rel="noopener noreferrer">Book a meeting</a>
+    </div>
+
+    <div class="kpis">
+      <article>
+        <p class="k-label">AI outputs QA’d</p>
+        <p class="k-value" data-target="100000">0</p>
+      </article>
+      <article>
+        <p class="k-label">Critical mistakes corrected</p>
+        <p class="k-value" data-target="10000">0</p>
+      </article>
+    </div>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+</html>
