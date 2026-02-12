@@ -1,245 +1,386 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+
+/*
+ * Pipeline diagram with sequential animation:
+ *   Phase 1 ("incoming"):  3 neutral pills travel AI -> Human
+ *   Phase 2 ("reviewing"):  Brief pause at Human node
+ *   Phase 3a ("approved"):  3 green pills travel Human -> Delivered
+ *   Phase 3b ("flagged"):   3 red pills travel Human -> back to AI
+ *
+ * Phases alternate between approved and flagged outcomes each cycle.
+ */
+
+type Phase = "incoming" | "reviewing" | "outgoing";
+type Outcome = "approved" | "flagged";
+
+function getPointOnPath(path: SVGPathElement, progress: number) {
+  const len = path.getTotalLength();
+  const pt = path.getPointAtLength(Math.min(Math.max(progress, 0), 1) * len);
+  return { x: pt.x, y: pt.y };
+}
 
 export function LoopSVG() {
-  const flagTextRef = useRef<SVGTextElement>(null);
-  const flagBadgeRef = useRef<SVGRectElement>(null);
-  const trackRef = useRef<SVGPathElement>(null);
-  const pillRefs = useRef<(SVGRectElement | null)[]>([]);
-  const isOkRef = useRef(false);
+  const incomingRef = useRef<SVGPathElement>(null);
+  const approvedRef = useRef<SVGPathElement>(null);
+  const returnRef = useRef<SVGPathElement>(null);
 
-  useEffect(() => {
-    const track = trackRef.current;
-    const pills = pillRefs.current.filter(Boolean) as SVGRectElement[];
-    if (!track || !pills.length) return;
+  const [phase, setPhase] = useState<Phase>("incoming");
+  const [outcome, setOutcome] = useState<Outcome>("approved");
+  const [pillPositions, setPillPositions] = useState<{ x: number; y: number }[]>([
+    { x: -40, y: -40 },
+    { x: -40, y: -40 },
+    { x: -40, y: -40 },
+  ]);
 
-    const total = track.getTotalLength();
-    const QA_SPLIT = 0.49;
-    let animId: number;
+  const animRef = useRef<number>(0);
+  const phaseStartRef = useRef<number>(0);
+  const phaseRef = useRef(phase);
+  const outcomeRef = useRef(outcome);
 
-    function stylePill(pill: SVGRectElement, pos: number) {
-      if (!isOkRef.current) {
-        pill.setAttribute("fill", "#ff7f9a");
-        pill.style.filter =
-          "drop-shadow(0 0 10px rgba(255, 98, 142, 0.95))";
-        return;
-      }
-      if (pos >= QA_SPLIT) {
-        pill.setAttribute("fill", "#71efbe");
-        pill.style.filter =
-          "drop-shadow(0 0 10px rgba(113, 239, 190, 0.95))";
-      } else {
-        pill.setAttribute("fill", "#8ec8ff");
-        pill.style.filter =
-          "drop-shadow(0 0 8px rgba(112, 195, 255, 0.8))";
-      }
+  phaseRef.current = phase;
+  outcomeRef.current = outcome;
+
+  const PILL_SPACING = 0.15; // fraction of path between each pill
+  const INCOMING_DURATION = 2200;
+  const REVIEW_DURATION = 1000;
+  const OUTGOING_DURATION = 2200;
+
+  const advancePhase = useCallback(() => {
+    const cur = phaseRef.current;
+    if (cur === "incoming") {
+      setPhase("reviewing");
+    } else if (cur === "reviewing") {
+      setPhase("outgoing");
+    } else {
+      // cycle: flip outcome, restart
+      setOutcome((prev) => (prev === "approved" ? "flagged" : "approved"));
+      setPhase("incoming");
     }
-
-    function frame(ms: number) {
-      const t = ms * 0.00006;
-      pills.forEach((pill, i) => {
-        const pos = (t + i * 0.24) % 1;
-        const point = track!.getPointAtLength(pos * total);
-        pill.setAttribute("x", (point.x - 9).toFixed(1));
-        pill.setAttribute("y", (point.y - 5).toFixed(1));
-        stylePill(pill, pos);
-      });
-      animId = requestAnimationFrame(frame);
-    }
-
-    animId = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(animId);
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      isOkRef.current = !isOkRef.current;
-      const flagText = flagTextRef.current;
-      const flagBadge = flagBadgeRef.current;
-      if (!flagText || !flagBadge) return;
+    phaseStartRef.current = performance.now();
+  }, [phase]);
 
-      if (isOkRef.current) {
-        flagText.textContent = "\u2713 Fixed";
-        flagText.setAttribute("fill", "#d8ffea");
-        flagBadge.setAttribute("fill", "rgba(86, 211, 155, 0.2)");
-        flagBadge.setAttribute("stroke", "rgba(86, 211, 155, 0.56)");
-      } else {
-        flagText.textContent = "\u26A0 Flag";
-        flagText.setAttribute("fill", "#ffd9de");
-        flagBadge.setAttribute("fill", "rgba(255, 111, 131, 0.17)");
-        flagBadge.setAttribute("stroke", "rgba(255, 111, 131, 0.55)");
+  useEffect(() => {
+    function tick(now: number) {
+      const elapsed = now - phaseStartRef.current;
+      const cur = phaseRef.current;
+      const out = outcomeRef.current;
+
+      if (cur === "incoming") {
+        const path = incomingRef.current;
+        if (path) {
+          const progress = elapsed / INCOMING_DURATION;
+          const positions = [0, 1, 2].map((i) => {
+            const p = Math.min(Math.max(progress - i * PILL_SPACING, 0), 1);
+            const eased = p < 1 ? 1 - Math.pow(1 - p, 2) : 1;
+            return getPointOnPath(path, eased);
+          });
+          setPillPositions(positions);
+          // All 3 pills have fully arrived
+          if (progress >= 1 + 2 * PILL_SPACING) {
+            advancePhase();
+          }
+        }
+      } else if (cur === "reviewing") {
+        // Hold pills at end of incoming path
+        const path = incomingRef.current;
+        if (path) {
+          const endPt = getPointOnPath(path, 1);
+          setPillPositions([endPt, endPt, endPt]);
+        }
+        if (elapsed >= REVIEW_DURATION) {
+          advancePhase();
+        }
+      } else if (cur === "outgoing") {
+        const path = out === "approved" ? approvedRef.current : returnRef.current;
+        if (path) {
+          const progress = elapsed / OUTGOING_DURATION;
+          const positions = [0, 1, 2].map((i) => {
+            const p = Math.min(Math.max(progress - i * PILL_SPACING, 0), 1);
+            const eased = p < 1 ? 1 - Math.pow(1 - p, 2) : 1;
+            return getPointOnPath(path, eased);
+          });
+          setPillPositions(positions);
+          if (progress >= 1 + 2 * PILL_SPACING) {
+            advancePhase();
+          }
+        }
       }
-    }, 3200);
 
-    return () => clearInterval(interval);
-  }, []);
+      animRef.current = requestAnimationFrame(tick);
+    }
+
+    animRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [phase, advancePhase]);
+
+  const isApproved = outcome === "approved";
+  const isOutgoing = phase === "outgoing";
+  const isReviewing = phase === "reviewing";
+
+  // Pill color depends on phase
+  let pillFill = "rgba(142,172,220,0.8)";
+  let pillGlow = "rgba(142,172,220,0.5)";
+  if (isOutgoing || isReviewing) {
+    if (isApproved) {
+      pillFill = "rgba(100,232,203,0.85)";
+      pillGlow = "rgba(100,232,203,0.6)";
+    } else {
+      pillFill = "rgba(255,140,160,0.85)";
+      pillGlow = "rgba(255,140,160,0.6)";
+    }
+  }
 
   return (
     <svg
-      className="absolute inset-0 h-full w-full"
-      viewBox="0 0 1400 900"
-      aria-hidden="true"
+      viewBox="0 0 900 280"
+      className="w-full"
+      style={{ maxWidth: 820 }}
+      role="img"
+      aria-label="Pipeline diagram showing AI output flowing through human review to delivery or correction"
     >
       <defs>
-        <linearGradient id="loopGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#64e8cb" />
-          <stop offset="100%" stopColor="#7ea9ff" />
-        </linearGradient>
-        <marker
-          id="flowArrow"
-          viewBox="0 0 10 10"
-          refX="8"
-          refY="5"
-          markerWidth="7"
-          markerHeight="7"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#7ea9ff" />
-        </marker>
+        <filter id="nodeGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id="pillShadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
 
-      {/* Grid lines */}
-      <g className="opacity-100">
-        {[
-          "M80 180 C420 120 980 120 1320 180",
-          "M40 320 C360 260 1040 260 1360 330",
-          "M100 470 C440 420 980 420 1320 490",
-          "M70 620 C420 570 980 570 1310 650",
-          "M200 760 C560 710 940 710 1220 790",
-        ].map((d, i) => (
-          <path
-            key={i}
-            d={d}
-            fill="none"
-            stroke="rgba(127, 151, 191, 0.18)"
-            strokeWidth="1"
-          />
-        ))}
-      </g>
+      {/* ===== TRACKS (hidden paths for animation) ===== */}
 
-      {/* Track */}
+      {/* AI -> Human */}
       <path
-        ref={trackRef}
-        d="M 170 272 C 470 95, 930 95, 1230 272"
+        ref={incomingRef}
+        d="M 140 140 C 230 140, 290 140, 380 140"
         fill="none"
-        stroke="url(#loopGrad)"
-        strokeWidth="3.3"
-        strokeLinecap="round"
-        strokeDasharray="8 13"
-        markerEnd="url(#flowArrow)"
-        className="animate-track"
+        stroke="none"
+      />
+      {/* Human -> Delivered */}
+      <path
+        ref={approvedRef}
+        d="M 520 140 C 610 140, 670 140, 760 140"
+        fill="none"
+        stroke="none"
+      />
+      {/* Human -> back to AI */}
+      <path
+        ref={returnRef}
+        d="M 450 175 C 420 230, 300 250, 140 210"
+        fill="none"
+        stroke="none"
       />
 
-      {/* Incoming node */}
-      <g transform="translate(120 212)">
-        <rect
-          width="130"
-          height="76"
-          rx="14"
-          fill="rgba(9, 16, 31, 0.62)"
-          stroke="rgba(137, 171, 230, 0.34)"
-        />
-        <text
-          x="65"
-          y="46"
-          textAnchor="middle"
-          fill="#d8e7ff"
-          fontSize="13"
-          fontWeight="600"
-        >
-          Incoming
+      {/* ===== VISIBLE TRACK LINES ===== */}
+
+      {/* AI -> Human track */}
+      <line x1="155" y1="140" x2="370" y2="140" stroke="rgba(142,172,220,0.15)" strokeWidth="2" strokeDasharray="6 8" />
+      <polygon points="368,134 380,140 368,146" fill="rgba(142,172,220,0.3)" />
+
+      {/* Human -> Delivered track */}
+      <line
+        x1="530" y1="140" x2="745" y2="140"
+        stroke="rgba(100,232,203,0.15)" strokeWidth="2" strokeDasharray="6 8"
+        style={{ opacity: isApproved || !isOutgoing ? 0.8 : 0.2, transition: "opacity 0.6s" }}
+      />
+      <polygon
+        points="743,134 755,140 743,146"
+        fill="rgba(100,232,203,0.3)"
+        style={{ opacity: isApproved || !isOutgoing ? 0.8 : 0.2, transition: "opacity 0.6s" }}
+      />
+
+      {/* Return curved track */}
+      <path
+        d="M 450 175 C 420 230, 300 250, 155 210"
+        fill="none"
+        stroke="rgba(255,140,160,0.12)"
+        strokeWidth="2"
+        strokeDasharray="6 8"
+        style={{ opacity: !isApproved || !isOutgoing ? 0.8 : 0.15, transition: "opacity 0.6s" }}
+      />
+      <polygon
+        points="160,204 148,212 156,218"
+        fill="rgba(255,140,160,0.3)"
+        style={{ opacity: !isApproved || !isOutgoing ? 0.8 : 0.15, transition: "opacity 0.6s" }}
+      />
+
+      {/* Return label */}
+      <text
+        x="310" y="255"
+        textAnchor="middle"
+        fill="rgba(255,160,175,0.45)"
+        fontSize="10"
+        fontFamily="Inter, system-ui, sans-serif"
+        fontWeight="500"
+        style={{ opacity: !isApproved && isOutgoing ? 0.9 : 0.3, transition: "opacity 0.6s" }}
+      >
+        Returned for correction
+      </text>
+
+      {/* ===== NODE: AI OUTPUT ===== */}
+      <g transform="translate(20, 108)">
+        <rect width="120" height="64" rx="12" fill="rgba(12,20,38,0.9)" stroke="rgba(142,172,220,0.25)" strokeWidth="1" />
+        {/* CPU icon */}
+        <g transform="translate(14, 18)">
+          <rect x="2" y="2" width="18" height="18" rx="3" fill="none" stroke="rgba(142,172,220,0.6)" strokeWidth="1.2" />
+          <circle cx="11" cy="11" r="3.5" fill="none" stroke="rgba(142,172,220,0.5)" strokeWidth="1" />
+          <line x1="6" y1="0" x2="6" y2="2" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
+          <line x1="11" y1="0" x2="11" y2="2" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
+          <line x1="16" y1="0" x2="16" y2="2" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
+          <line x1="6" y1="20" x2="6" y2="22" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
+          <line x1="11" y1="20" x2="11" y2="22" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
+          <line x1="16" y1="20" x2="16" y2="22" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
+        </g>
+        <text x="60" y="32" textAnchor="middle" fill="rgba(200,216,240,0.95)" fontSize="13" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
+          AI Output
+        </text>
+        <text x="60" y="48" textAnchor="middle" fill="rgba(142,172,220,0.5)" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif">
+          Raw content
         </text>
       </g>
 
-      {/* Human QA node */}
-      <g transform="translate(639 118)">
+      {/* ===== NODE: HUMAN REVIEW (center, prominent) ===== */}
+      <g transform="translate(375, 96)">
+        {/* Outer glow ring */}
         <rect
-          width="122"
-          height="64"
-          rx="14"
-          fill="rgba(10, 21, 38, 0.75)"
-          stroke="rgba(134, 228, 198, 0.55)"
+          x="-5" y="-5" width="160" height="98" rx="18"
+          fill="none"
+          stroke={isReviewing ? (isApproved ? "rgba(100,232,203,0.2)" : "rgba(255,140,160,0.2)") : "rgba(142,172,220,0.08)"}
+          strokeWidth="1"
+          style={{ transition: "stroke 0.6s" }}
         />
-        <text
-          x="61"
-          y="33"
-          textAnchor="middle"
-          fill="#d8e7ff"
-          fontSize="13"
-          fontWeight="600"
-        >
-          Human QA
+        <rect
+          width="150" height="88" rx="14"
+          fill="rgba(10,18,36,0.95)"
+          stroke={isReviewing ? (isApproved ? "rgba(100,232,203,0.5)" : "rgba(255,140,160,0.5)") : "rgba(142,172,220,0.2)"}
+          strokeWidth="1.2"
+          style={{ transition: "stroke 0.6s" }}
+        />
+        {/* Person icon */}
+        <g transform="translate(18, 20)">
+          <circle cx="10" cy="8" r="6" fill="none" stroke="rgba(200,216,240,0.6)" strokeWidth="1.3" />
+          <path d="M0 28 C0 20, 20 20, 20 28" fill="none" stroke="rgba(200,216,240,0.6)" strokeWidth="1.3" />
+        </g>
+        <text x="75" y="36" textAnchor="middle" fill="#edf3ff" fontSize="13.5" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
+          Human
         </text>
-        <text
-          x="61"
-          y="50"
-          textAnchor="middle"
-          fill="#d8e7ff"
-          fontSize="13"
-          fontWeight="600"
-        >
+        <text x="75" y="52" textAnchor="middle" fill="#edf3ff" fontSize="13.5" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
           Review
         </text>
+        <text x="75" y="72" textAnchor="middle" fill="rgba(175,189,216,0.6)" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif">
+          Verify &amp; correct
+        </text>
       </g>
 
-      {/* Delivered node */}
-      <g transform="translate(1150 212)">
+      {/* ===== STATUS BADGE ===== */}
+      <g transform="translate(395, 56)">
         <rect
-          width="130"
-          height="76"
-          rx="14"
-          fill="rgba(9, 16, 31, 0.62)"
-          stroke="rgba(137, 171, 230, 0.34)"
+          width={isApproved ? 110 : 100}
+          height="30" rx="15"
+          fill={isOutgoing || isReviewing
+            ? (isApproved ? "rgba(80,210,170,0.12)" : "rgba(255,120,140,0.12)")
+            : "rgba(142,172,220,0.06)"
+          }
+          stroke={isOutgoing || isReviewing
+            ? (isApproved ? "rgba(80,210,170,0.5)" : "rgba(255,120,140,0.5)")
+            : "rgba(142,172,220,0.15)"
+          }
+          strokeWidth="1"
+          filter="url(#nodeGlow)"
+          style={{ transition: "all 0.6s" }}
         />
-        <text
-          x="65"
-          y="46"
-          textAnchor="middle"
-          fill="#d8e7ff"
-          fontSize="13"
-          fontWeight="600"
+        {isApproved ? (
+          <>
+            <g transform="translate(10, 6)">
+              <circle cx="9" cy="9" r="7.5" fill="none" stroke="#67e7cc" strokeWidth="1.5"
+                style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
+              />
+              <path d="M5.5 9.5 L8 12 L12.5 6.5" fill="none" stroke="#67e7cc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
+              />
+            </g>
+            <text x="60" y="20" textAnchor="start" fontSize="12" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
+              fill="#b8fce6"
+              style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
+            >
+              Verified
+            </text>
+          </>
+        ) : (
+          <>
+            <g transform="translate(10, 5)">
+              <line x1="5" y1="4" x2="5" y2="18" stroke="#ff8c9e" strokeWidth="2" strokeLinecap="round"
+                style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
+              />
+              <path d="M5 4 L18 7 L18 13 L5 10 Z" fill="rgba(255,140,160,0.3)" stroke="#ff8c9e" strokeWidth="1.3" strokeLinejoin="round"
+                style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
+              />
+            </g>
+            <text x="56" y="20" textAnchor="start" fontSize="12" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
+              fill="#ffd0d6"
+              style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
+            >
+              Flagged
+            </text>
+          </>
+        )}
+      </g>
+
+      {/* ===== NODE: DELIVERED ===== */}
+      <g transform="translate(760, 108)">
+        <rect width="120" height="64" rx="12"
+          fill="rgba(12,20,38,0.9)"
+          stroke="rgba(100,232,203,0.25)" strokeWidth="1"
+          style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
+        />
+        {/* Checkmark doc icon */}
+        <g transform="translate(14, 16)"
+          style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
+        >
+          <rect x="2" y="1" width="16" height="20" rx="2.5" fill="none" stroke="rgba(100,232,203,0.6)" strokeWidth="1.2" />
+          <path d="M6 11 L9 14 L14 8" fill="none" stroke="rgba(100,232,203,0.7)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </g>
+        <text x="60" y="32" textAnchor="middle" fontSize="13" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
+          fill="rgba(200,240,228,0.95)"
+          style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
         >
           Delivered
         </text>
-      </g>
-
-      {/* Flag badge */}
-      <g transform="translate(782 178)">
-        <rect
-          ref={flagBadgeRef}
-          width="74"
-          height="30"
-          rx="10"
-          fill="rgba(255, 111, 131, 0.17)"
-          stroke="rgba(255, 111, 131, 0.55)"
-        />
-        <text
-          ref={flagTextRef}
-          x="37"
-          y="20"
-          textAnchor="middle"
-          fill="#ffd9de"
-          fontSize="12"
-          fontWeight="600"
+        <text x="60" y="48" textAnchor="middle" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif"
+          fill="rgba(100,232,203,0.45)"
+          style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
         >
-          {"\u26A0 Flag"}
+          Verified output
         </text>
       </g>
 
-      {/* Pills */}
-      {[0, 1, 2, 3].map((i) => (
+      {/* ===== ANIMATED PILLS (3, sequential) ===== */}
+      {pillPositions.map((pos, i) => (
         <rect
           key={i}
-          ref={(el) => {
-            pillRefs.current[i] = el;
-          }}
-          width="18"
+          x={pos.x - 10}
+          y={pos.y - 5}
+          width="20"
           height="10"
           rx="5"
-          fill="#9ddaff"
+          fill={pillFill}
+          filter="url(#pillShadow)"
           style={{
-            filter: "drop-shadow(0 0 8px rgba(112, 207, 255, 0.7))",
+            transition: "fill 0.5s",
+            filter: `drop-shadow(0 0 5px ${pillGlow})`,
           }}
         />
       ))}
