@@ -165,21 +165,21 @@ export function LoopSVG() {
       {/* AI -> Human */}
       <path
         ref={incomingRef}
-        d="M 140 140 C 230 140, 290 140, 380 140"
+        d="M 140 140 C 230 140, 280 140, 360 140"
         fill="none"
         stroke="none"
       />
       {/* Human -> Delivered */}
       <path
         ref={approvedRef}
-        d="M 520 140 C 610 140, 670 140, 760 140"
+        d="M 540 140 C 620 140, 680 140, 760 140"
         fill="none"
         stroke="none"
       />
       {/* Human -> back to AI */}
       <path
         ref={returnRef}
-        d="M 450 175 C 420 230, 300 250, 140 210"
+        d="M 450 185 C 420 240, 300 255, 140 210"
         fill="none"
         stroke="none"
       />
@@ -187,12 +187,12 @@ export function LoopSVG() {
       {/* ===== VISIBLE TRACK LINES ===== */}
 
       {/* AI -> Human track */}
-      <line x1="155" y1="140" x2="370" y2="140" stroke="rgba(142,172,220,0.15)" strokeWidth="2" strokeDasharray="6 8" />
-      <polygon points="368,134 380,140 368,146" fill="rgba(142,172,220,0.3)" />
+      <line x1="155" y1="140" x2="350" y2="140" stroke="rgba(142,172,220,0.15)" strokeWidth="2" strokeDasharray="6 8" />
+      <polygon points="348,134 360,140 348,146" fill="rgba(142,172,220,0.3)" />
 
       {/* Human -> Delivered track */}
       <line
-        x1="530" y1="140" x2="745" y2="140"
+        x1="550" y1="140" x2="745" y2="140"
         stroke="rgba(100,232,203,0.15)" strokeWidth="2" strokeDasharray="6 8"
         style={{ opacity: isApproved || !isOutgoing ? 0.8 : 0.2, transition: "opacity 0.6s" }}
       />
@@ -204,7 +204,7 @@ export function LoopSVG() {
 
       {/* Return curved track */}
       <path
-        d="M 450 175 C 420 230, 300 250, 155 210"
+        d="M 450 185 C 420 240, 300 255, 155 210"
         fill="none"
         stroke="rgba(255,140,160,0.12)"
         strokeWidth="2"
@@ -255,17 +255,17 @@ export function LoopSVG() {
       </g>
 
       {/* ===== NODE: HUMAN REVIEW (center, prominent) ===== */}
-      <g transform="translate(375, 96)">
+      <g transform="translate(355, 96)">
         {/* Outer glow ring */}
         <rect
-          x="-5" y="-5" width="160" height="98" rx="18"
+          x="-5" y="-5" width="200" height="98" rx="18"
           fill="none"
           stroke={isReviewing ? (isApproved ? "rgba(100,232,203,0.2)" : "rgba(255,140,160,0.2)") : "rgba(142,172,220,0.08)"}
           strokeWidth="1"
           style={{ transition: "stroke 0.6s" }}
         />
         <rect
-          width="150" height="88" rx="14"
+          width="190" height="88" rx="14"
           fill="rgba(10,18,36,0.95)"
           stroke={isReviewing ? (isApproved ? "rgba(100,232,203,0.5)" : "rgba(255,140,160,0.5)") : "rgba(142,172,220,0.2)"}
           strokeWidth="1.2"
@@ -286,7 +286,7 @@ export function LoopSVG() {
       </g>
 
       {/* ===== STATUS BADGE ===== */}
-      <g transform="translate(395, 56)">
+      <g transform="translate(390, 56)">
         <rect
           width={isApproved ? 110 : 100}
           height="30" rx="15"
