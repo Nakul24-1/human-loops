@@ -1,43 +1,104 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  motion,
-  AnimatePresence,
-  type Variants,
-} from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 /* ──────────────────────────────────────
-   Types
+   Types & constants
    ────────────────────────────────────── */
-type PacketStatus = "incoming" | "reviewing" | "approved" | "flagged";
+type PacketStatus = "incoming" | "reviewing" | "verified" | "flagged";
 
 interface Packet {
   id: number;
   status: PacketStatus;
   label: string;
+  sector: "legal" | "healthcare" | "finance";
 }
 
-const LABELS = [
-  "api/auth",
-  "usr/data",
-  "txn/pay",
-  "msg/send",
-  "img/upload",
-  "ws/conn",
-  "db/query",
-  "evt/log",
-  "ml/infer",
-  "cdn/pull",
+const TASK_POOL: { label: string; sector: Packet["sector"] }[] = [
+  { label: "Contract clause review", sector: "legal" },
+  { label: "Patient intake form", sector: "healthcare" },
+  { label: "Invoice reconciliation", sector: "finance" },
+  { label: "NDA classification", sector: "legal" },
+  { label: "Lab result summary", sector: "healthcare" },
+  { label: "Expense categorisation", sector: "finance" },
+  { label: "Compliance check", sector: "legal" },
+  { label: "Insurance claim entry", sector: "healthcare" },
+  { label: "Tax filing review", sector: "finance" },
+  { label: "Deposition tagging", sector: "legal" },
+  { label: "Prescription validation", sector: "healthcare" },
+  { label: "Payroll data entry", sector: "finance" },
+  { label: "Case brief extraction", sector: "legal" },
+  { label: "Discharge note review", sector: "healthcare" },
+  { label: "Audit trail check", sector: "finance" },
 ];
+
+const MAX_INCOMING = 10;
+const MAX_REVIEWING = 10;
+const MAX_VERIFIED = 5;
+const MAX_FLAGGED = 5;
+
+const FLAG_RATE = 0.25;
+
+/* ──────────────────────────────────────
+   Icons (inline SVGs matching loop-svg)
+   ────────────────────────────────────── */
+function AiIcon({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 22 22" fill="none" className="shrink-0">
+      <rect x="2" y="2" width="18" height="18" rx="3" stroke={color} strokeWidth="1.3" />
+      <circle cx="11" cy="11" r="3.5" stroke={color} strokeWidth="1" fill="none" />
+      <line x1="6" y1="0" x2="6" y2="2" stroke={color} strokeWidth="1" />
+      <line x1="11" y1="0" x2="11" y2="2" stroke={color} strokeWidth="1" />
+      <line x1="16" y1="0" x2="16" y2="2" stroke={color} strokeWidth="1" />
+      <line x1="6" y1="20" x2="6" y2="22" stroke={color} strokeWidth="1" />
+      <line x1="11" y1="20" x2="11" y2="22" stroke={color} strokeWidth="1" />
+      <line x1="16" y1="20" x2="16" y2="22" stroke={color} strokeWidth="1" />
+    </svg>
+  );
+}
+
+function HumanIcon({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 22 28" fill="none" className="shrink-0">
+      <circle cx="11" cy="8" r="6" stroke={color} strokeWidth="1.3" fill="none" />
+      <path d="M1 28 C1 20, 21 20, 21 28" stroke={color} strokeWidth="1.3" fill="none" />
+    </svg>
+  );
+}
+
+function CheckIcon({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="shrink-0">
+      <circle cx="10" cy="10" r="8" stroke={color} strokeWidth="1.3" fill="none" />
+      <path d="M6 10.5 L8.5 13 L14 7" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  );
+}
+
+function FlagIcon({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 20 22" fill="none" className="shrink-0">
+      <line x1="4" y1="2" x2="4" y2="20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M4 2 L16 5 L16 13 L4 10 Z" fill={`${color}30`} stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* ──────────────────────────────────────
+   Sector badge colors
+   ────────────────────────────────────── */
+const SECTOR_COLORS: Record<Packet["sector"], string> = {
+  legal: "rgba(168,148,255,0.6)",
+  healthcare: "rgba(100,200,255,0.6)",
+  finance: "rgba(255,200,100,0.6)",
+};
 
 /* ──────────────────────────────────────
    Animation variants
    ────────────────────────────────────── */
-
-/* Incoming lane: slide in from far left */
 const incomingVariants: Variants = {
-  initial: { x: -120, opacity: 0, scale: 0.8 },
+  initial: { x: -100, opacity: 0, scale: 0.85 },
   animate: {
     x: 0,
     opacity: 1,
@@ -45,94 +106,98 @@ const incomingVariants: Variants = {
     transition: { type: "spring", stiffness: 120, damping: 16 },
   },
   exit: {
-    x: 120,
+    x: 80,
     opacity: 0,
-    scale: 0.85,
+    scale: 0.9,
     transition: { duration: 0.3, ease: "easeIn" },
   },
 };
 
-/* Reviewing lane: pop in from incoming */
 const reviewingVariants: Variants = {
-  initial: { x: -80, opacity: 0, scale: 0.9 },
+  initial: { x: -60, opacity: 0, scale: 0.92 },
   animate: {
     x: 0,
     opacity: 1,
     scale: 1,
-    transition: { type: "spring", stiffness: 200, damping: 20 },
+    transition: { type: "spring", stiffness: 180, damping: 20 },
   },
   exit: (status: string) =>
-    status === "approved"
-      ? { x: 100, opacity: 0, transition: { duration: 0.35, ease: "easeIn" } }
-      : { y: 60, x: -40, opacity: 0, rotate: -8, transition: { duration: 0.4, ease: "easeIn" } },
+    status === "verified"
+      ? { x: 80, opacity: 0, transition: { duration: 0.35, ease: "easeIn" } }
+      : {
+          y: 50,
+          x: -30,
+          opacity: 0,
+          rotate: -6,
+          transition: { duration: 0.4, ease: "easeIn" },
+        },
 };
 
-/* Approved lane: glide in from review */
-const approvedVariants: Variants = {
-  initial: { x: -60, opacity: 0 },
+const verifiedVariants: Variants = {
+  initial: { x: -50, opacity: 0 },
   animate: {
     x: 0,
     opacity: 1,
     transition: { type: "spring", stiffness: 140, damping: 18 },
   },
   exit: {
-    x: 160,
     opacity: 0,
-    transition: { duration: 0.5, ease: "easeIn" },
+    scale: 0.85,
+    y: -10,
+    transition: { duration: 0.4, ease: "easeOut" },
   },
 };
 
-/* Flagged lane: tumble down from review */
 const flaggedVariants: Variants = {
-  initial: { y: -40, opacity: 0, rotate: 0 },
+  initial: { y: -30, opacity: 0 },
   animate: {
     y: 0,
     opacity: 1,
-    rotate: 0,
-    transition: { type: "spring", stiffness: 180, damping: 14 },
+    transition: { type: "spring", stiffness: 160, damping: 14 },
   },
   exit: {
-    y: 30,
     opacity: 0,
     scale: 0.85,
-    transition: { duration: 0.4 },
+    y: 10,
+    transition: { duration: 0.4, ease: "easeOut" },
   },
 };
 
 /* ──────────────────────────────────────
-   Packet chip component
+   Packet chip
    ────────────────────────────────────── */
 function PacketChip({
   packet,
   variants,
+  icon,
 }: {
   packet: Packet;
   variants: Variants;
+  icon: React.ReactNode;
 }) {
-  const colors: Record<PacketStatus, { bg: string; border: string; dot: string }> = {
+  const statusColors: Record<
+    PacketStatus,
+    { bg: string; border: string }
+  > = {
     incoming: {
-      bg: "rgba(129,174,252,0.08)",
-      border: "rgba(129,174,252,0.3)",
-      dot: "#81aefc",
+      bg: "rgba(129,174,252,0.06)",
+      border: "rgba(129,174,252,0.25)",
     },
     reviewing: {
-      bg: "rgba(250,204,80,0.08)",
-      border: "rgba(250,204,80,0.35)",
-      dot: "#facc50",
+      bg: "rgba(250,204,80,0.06)",
+      border: "rgba(250,204,80,0.3)",
     },
-    approved: {
-      bg: "rgba(100,232,203,0.08)",
-      border: "rgba(100,232,203,0.35)",
-      dot: "#64e8cb",
+    verified: {
+      bg: "rgba(100,232,203,0.06)",
+      border: "rgba(100,232,203,0.3)",
     },
     flagged: {
-      bg: "rgba(255,110,130,0.08)",
-      border: "rgba(255,110,130,0.35)",
-      dot: "#ff6e82",
+      bg: "rgba(255,110,130,0.06)",
+      border: "rgba(255,110,130,0.3)",
     },
   };
 
-  const c = colors[packet.status];
+  const c = statusColors[packet.status];
 
   return (
     <motion.div
@@ -146,13 +211,20 @@ function PacketChip({
         background: c.bg,
         border: `1px solid ${c.border}`,
       }}
-      className="flex items-center gap-2 rounded-lg px-3 py-2 font-mono text-xs"
+      className="flex items-center gap-2.5 rounded-lg px-3 py-2"
     >
-      <span
-        className="inline-block h-2 w-2 rounded-full"
-        style={{ background: c.dot, boxShadow: `0 0 6px ${c.dot}` }}
-      />
-      <span className="text-foreground/90">{packet.label}</span>
+      {icon}
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <span className="text-xs font-medium text-foreground/90 truncate">
+          {packet.label}
+        </span>
+        <span
+          className="text-[10px] font-medium uppercase tracking-wider"
+          style={{ color: SECTOR_COLORS[packet.sector] }}
+        >
+          {packet.sector}
+        </span>
+      </div>
     </motion.div>
   );
 }
@@ -163,129 +235,196 @@ function PacketChip({
 export default function FramerDemo() {
   const [packets, setPackets] = useState<Packet[]>([]);
   const nextId = useRef(0);
-  const FLAG_RATE = 0.25; // 25% flagged
+  const totalVerified = useRef(0);
+  const totalFlagged = useRef(0);
 
-  /* Spawn a new packet every 800ms */
+  /* Spawn a packet only if incoming < MAX */
   const spawnPacket = useCallback(() => {
-    const id = nextId.current++;
-    const label = LABELS[id % LABELS.length];
-    setPackets((prev) => [...prev, { id, status: "incoming", label }]);
+    setPackets((prev) => {
+      const incomingCount = prev.filter((p) => p.status === "incoming").length;
+      if (incomingCount >= MAX_INCOMING) return prev;
+
+      const id = nextId.current++;
+      const task = TASK_POOL[id % TASK_POOL.length];
+      return [
+        ...prev,
+        { id, status: "incoming" as const, label: task.label, sector: task.sector },
+      ];
+    });
   }, []);
 
-  /* Lifecycle: incoming -> reviewing -> approved/flagged -> removed */
+  /* Pipeline timers */
   useEffect(() => {
-    const spawnInterval = setInterval(spawnPacket, 800);
-    return () => clearInterval(spawnInterval);
-  }, [spawnPacket]);
+    const spawnInterval = setInterval(spawnPacket, 700);
 
-  useEffect(() => {
-    /* Move incoming -> reviewing after 1s */
+    /* incoming -> reviewing (only if reviewing has space) */
     const reviewTimer = setInterval(() => {
       setPackets((prev) => {
+        const reviewingCount = prev.filter((p) => p.status === "reviewing").length;
+        if (reviewingCount >= MAX_REVIEWING) return prev;
+
         const idx = prev.findIndex((p) => p.status === "incoming");
         if (idx === -1) return prev;
         const copy = [...prev];
         copy[idx] = { ...copy[idx], status: "reviewing" };
         return copy;
       });
-    }, 1000);
+    }, 900);
 
-    /* Move reviewing -> approved/flagged after 1.2s */
+    /* reviewing -> verified / flagged */
     const decideTimer = setInterval(() => {
       setPackets((prev) => {
         const idx = prev.findIndex((p) => p.status === "reviewing");
         if (idx === -1) return prev;
         const copy = [...prev];
         const isFlagged = Math.random() < FLAG_RATE;
-        copy[idx] = {
-          ...copy[idx],
-          status: isFlagged ? "flagged" : "approved",
-        };
+        const newStatus: PacketStatus = isFlagged ? "flagged" : "verified";
+        copy[idx] = { ...copy[idx], status: newStatus };
+
+        if (isFlagged) {
+          totalFlagged.current++;
+        } else {
+          totalVerified.current++;
+        }
+
         return copy;
       });
-    }, 1200);
+    }, 1100);
 
-    /* Remove approved/flagged after 2s */
-    const cleanTimer = setInterval(() => {
+    /* Trim verified lane to MAX */
+    const trimVerified = setInterval(() => {
       setPackets((prev) => {
-        const idx = prev.findIndex(
-          (p) => p.status === "approved" || p.status === "flagged"
-        );
-        if (idx === -1) return prev;
-        return prev.filter((_, i) => i !== idx);
+        const verified = prev.filter((p) => p.status === "verified");
+        if (verified.length <= MAX_VERIFIED) return prev;
+        const oldest = verified[0].id;
+        return prev.filter((p) => p.id !== oldest);
       });
-    }, 2000);
+    }, 600);
+
+    /* Trim flagged lane to MAX */
+    const trimFlagged = setInterval(() => {
+      setPackets((prev) => {
+        const flagged = prev.filter((p) => p.status === "flagged");
+        if (flagged.length <= MAX_FLAGGED) return prev;
+        const oldest = flagged[0].id;
+        return prev.filter((p) => p.id !== oldest);
+      });
+    }, 600);
 
     return () => {
+      clearInterval(spawnInterval);
       clearInterval(reviewTimer);
       clearInterval(decideTimer);
-      clearInterval(cleanTimer);
+      clearInterval(trimVerified);
+      clearInterval(trimFlagged);
     };
-  }, []);
+  }, [spawnPacket]);
 
-  /* Partition packets by status */
+  /* Partition */
   const incoming = packets.filter((p) => p.status === "incoming");
   const reviewing = packets.filter((p) => p.status === "reviewing");
-  const approved = packets.filter((p) => p.status === "approved");
+  const verified = packets.filter((p) => p.status === "verified");
   const flagged = packets.filter((p) => p.status === "flagged");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-8 font-sans">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background p-8 font-sans">
       <div className="text-center">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Framer Motion Demo
+          Human-in-the-Loop Review
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Continuous packet flow with human review gating
+          AI-processed tasks flow through human review before delivery
         </p>
       </div>
 
       {/* Pipeline lanes */}
-      <div className="flex w-full max-w-5xl items-start gap-4">
+      <div className="flex w-full max-w-6xl items-start gap-4">
         {/* Incoming */}
-        <Lane title="Incoming" count={incoming.length} color="#81aefc">
+        <Lane
+          title="AI Output"
+          count={incoming.length}
+          max={MAX_INCOMING}
+          color="#81aefc"
+          icon={<AiIcon color="#81aefc" />}
+        >
           <AnimatePresence mode="popLayout">
             {incoming.map((p) => (
-              <PacketChip key={p.id} packet={p} variants={incomingVariants} />
+              <PacketChip
+                key={p.id}
+                packet={p}
+                variants={incomingVariants}
+                icon={<AiIcon color="#81aefc" />}
+              />
             ))}
           </AnimatePresence>
         </Lane>
 
-        {/* Arrow */}
         <Arrow color="#81aefc" />
 
         {/* Reviewing */}
-        <Lane title="Reviewing" count={reviewing.length} color="#facc50">
+        <Lane
+          title="Human Review"
+          count={reviewing.length}
+          max={MAX_REVIEWING}
+          color="#facc50"
+          icon={<HumanIcon color="#facc50" />}
+        >
           <AnimatePresence mode="popLayout">
             {reviewing.map((p) => (
-              <PacketChip key={p.id} packet={p} variants={reviewingVariants} />
+              <PacketChip
+                key={p.id}
+                packet={p}
+                variants={reviewingVariants}
+                icon={<HumanIcon color="#facc50" />}
+              />
             ))}
           </AnimatePresence>
         </Lane>
 
-        {/* Fork */}
-        <div className="flex flex-col items-center gap-6 pt-12">
+        {/* Fork arrows */}
+        <div className="flex flex-col items-center gap-8 pt-12">
           <Arrow color="#64e8cb" />
-          <div className="h-6" />
           <Arrow color="#ff6e82" rotate />
         </div>
 
         {/* Outcomes */}
         <div className="flex flex-1 flex-col gap-4">
-          {/* Approved */}
-          <Lane title="Verified" count={approved.length} color="#64e8cb" compact>
+          <Lane
+            title="Verified"
+            count={verified.length}
+            max={MAX_VERIFIED}
+            color="#64e8cb"
+            icon={<CheckIcon color="#64e8cb" />}
+            compact
+          >
             <AnimatePresence mode="popLayout">
-              {approved.map((p) => (
-                <PacketChip key={p.id} packet={p} variants={approvedVariants} />
+              {verified.map((p) => (
+                <PacketChip
+                  key={p.id}
+                  packet={p}
+                  variants={verifiedVariants}
+                  icon={<CheckIcon color="#64e8cb" />}
+                />
               ))}
             </AnimatePresence>
           </Lane>
 
-          {/* Flagged */}
-          <Lane title="Flagged" count={flagged.length} color="#ff6e82" compact>
+          <Lane
+            title="Flagged"
+            count={flagged.length}
+            max={MAX_FLAGGED}
+            color="#ff6e82"
+            icon={<FlagIcon color="#ff6e82" />}
+            compact
+          >
             <AnimatePresence mode="popLayout">
               {flagged.map((p) => (
-                <PacketChip key={p.id} packet={p} variants={flaggedVariants} />
+                <PacketChip
+                  key={p.id}
+                  packet={p}
+                  variants={flaggedVariants}
+                  icon={<FlagIcon color="#ff6e82" />}
+                />
               ))}
             </AnimatePresence>
           </Lane>
@@ -293,7 +432,11 @@ export default function FramerDemo() {
       </div>
 
       {/* Stats bar */}
-      <StatsBar packets={packets} totalSpawned={nextId.current} />
+      <StatsBar
+        inPipeline={packets.length}
+        totalVerified={totalVerified.current}
+        totalFlagged={totalFlagged.current}
+      />
     </div>
   );
 }
@@ -301,44 +444,45 @@ export default function FramerDemo() {
 /* ──────────────────────────────────────
    Sub-components
    ────────────────────────────────────── */
-
 function Lane({
   title,
   count,
+  max,
   color,
+  icon,
   compact,
   children,
 }: {
   title: string;
   count: number;
+  max: number;
   color: string;
+  icon: React.ReactNode;
   compact?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div className={`flex flex-1 flex-col gap-2 ${compact ? "" : ""}`}>
       <div className="flex items-center gap-2 px-1">
-        <span
-          className="inline-block h-2 w-2 rounded-full"
-          style={{ background: color, boxShadow: `0 0 8px ${color}` }}
-        />
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {icon}
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {title}
         </span>
         <motion.span
           key={count}
-          initial={{ scale: 1.4, opacity: 0.5 }}
+          initial={{ scale: 1.3, opacity: 0.5 }}
           animate={{ scale: 1, opacity: 1 }}
           className="ml-auto text-xs tabular-nums text-muted-foreground"
         >
           {count}
+          <span className="text-muted-foreground/40">/{max}</span>
         </motion.span>
       </div>
 
       <div
-        className="flex min-h-[120px] flex-col gap-2 rounded-xl border border-border/50 p-3"
+        className="flex min-h-[140px] flex-col gap-2 rounded-xl border border-border/50 p-3 overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${color}05, transparent)`,
+          background: `linear-gradient(135deg, ${color}06, transparent)`,
         }}
       >
         {children}
@@ -351,10 +495,10 @@ function Arrow({ color, rotate }: { color: string; rotate?: boolean }) {
   return (
     <div
       className="flex items-center pt-14"
-      style={rotate ? { transform: "rotate(30deg)", marginTop: 4 } : undefined}
+      style={rotate ? { transform: "rotate(28deg)", marginTop: 8 } : undefined}
     >
       <motion.div
-        animate={{ x: [0, 6, 0] }}
+        animate={{ x: [0, 5, 0] }}
         transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
       >
         <svg width="32" height="16" viewBox="0 0 32 16" fill="none">
@@ -373,15 +517,14 @@ function Arrow({ color, rotate }: { color: string; rotate?: boolean }) {
 }
 
 function StatsBar({
-  packets,
-  totalSpawned,
+  inPipeline,
+  totalVerified,
+  totalFlagged,
 }: {
-  packets: Packet[];
-  totalSpawned: number;
+  inPipeline: number;
+  totalVerified: number;
+  totalFlagged: number;
 }) {
-  const totalApproved = totalSpawned - packets.length;
-  const flaggedCount = packets.filter((p) => p.status === "flagged").length;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -391,30 +534,23 @@ function StatsBar({
       style={{ background: "rgba(8,14,27,0.6)" }}
     >
       <span>
-        Total processed:{" "}
+        {"In pipeline: "}
         <span className="font-semibold text-foreground tabular-nums">
-          {totalSpawned}
+          {inPipeline}
         </span>
       </span>
       <span className="h-3 w-px bg-border" />
       <span>
-        In pipeline:{" "}
-        <span className="font-semibold text-foreground tabular-nums">
-          {packets.length}
-        </span>
-      </span>
-      <span className="h-3 w-px bg-border" />
-      <span>
-        Cleared:{" "}
+        {"Total verified: "}
         <span className="font-semibold tabular-nums" style={{ color: "#64e8cb" }}>
-          {totalApproved}
+          {totalVerified}
         </span>
       </span>
       <span className="h-3 w-px bg-border" />
       <span>
-        Under review:{" "}
+        {"Total flagged: "}
         <span className="font-semibold tabular-nums" style={{ color: "#ff6e82" }}>
-          {flaggedCount}
+          {totalFlagged}
         </span>
       </span>
     </motion.div>
