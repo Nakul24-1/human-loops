@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     description: "We QA AI outputs, filter datasets, and train models.",
     type: "website",
   },
+  metadataBase: new URL("https://thehumanloops.com"),
 };
 
 export const viewport: Viewport = {
@@ -27,9 +28,26 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Human Loops",
+    url: "https://humanloops.com",
+    logo: "https://humanloops.com/human-loop-logo.svg",
+    description: "Human-in-the-Loop QA for AI at Scale. We verify, correct, and deliver accurate data for legal, healthcare, and finance AI agents.",
+    sameAs: [
+      "https://www.linkedin.com/company/human-loops/",
+      "https://twitter.com/humanloops"
+    ]
+  };
+
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {children}
       </body>
     </html>
