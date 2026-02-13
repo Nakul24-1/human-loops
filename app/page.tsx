@@ -1,4 +1,4 @@
-import { LoopSVG } from "@/components/loop-svg";
+import { LoopAnimation } from "@/components/loop-animation";
 import { Hero } from "@/components/hero";
 import { Socials } from "@/components/socials";
 
@@ -18,8 +18,8 @@ export default function Home() {
       <Hero />
 
       {/* Pipeline diagram -- separate section, not overlapping */}
-      <div className="flex w-full flex-1 items-start justify-center px-6 pb-10">
-        <LoopSVG />
+      <div className="flex w-full flex-1 items-start justify-center px-4 pb-4">
+        <LoopAnimation />
       </div>
 
       <Socials />

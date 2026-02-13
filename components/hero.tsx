@@ -3,21 +3,21 @@ import { KpiCounter } from "./kpi-counter";
 
 export function Hero() {
   return (
-    <header className="flex shrink-0 flex-col items-center px-6 pt-14 pb-6 text-center">
+    <header className="flex shrink-0 flex-col items-center px-6 pt-8 pb-6 text-center">
       <Image
-        src="/logo.svg"
+        src="/human-loop-logo.svg"
         alt="Human Loops logo"
-        width={160}
-        height={64}
-        className="mb-5 object-contain"
+        width={200}
+        height={80}
+        className="mb-1 object-contain"
         priority
       />
 
-      <h1 className="m-0 max-w-[24ch] text-balance text-[clamp(1.5rem,3.5vw,2.5rem)] leading-[1.18] font-extrabold text-foreground">
+      <h1 className="m-0 max-w-[24ch] text-balance text-[clamp(1.25rem,3vw,2.25rem)] leading-[1.18] font-extrabold text-foreground">
         Human-in-the-Loop QA for AI at Scale
       </h1>
 
-      <p className="mt-3 max-w-[52ch] text-pretty text-[clamp(0.95rem,1.4vw,1.08rem)] leading-relaxed text-muted-foreground">
+      <p className="mt-4 max-w-[52ch] text-pretty text-[clamp(0.95rem,1.4vw,1.08rem)] leading-relaxed text-muted-foreground">
         AI generates. We verify, correct, and deliver --
         so you ship accurate outputs without slowing down.
       </p>
@@ -27,6 +27,7 @@ export function Hero() {
           href="https://calendly.com/shloak/introductory-call?month=2026-02"
           className="inline-block rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground no-underline transition-opacity hover:opacity-90"
           target="_blank"
+          rel="noopener noreferrer"
         >
           Book a meeting
         </a>
