@@ -233,10 +233,15 @@ function PacketChip({
    Main demo
    ────────────────────────────────────── */
 export default function FramerDemo() {
+  const [mounted, setMounted] = useState(false);
   const [packets, setPackets] = useState<Packet[]>([]);
   const nextId = useRef(0);
   const totalVerified = useRef(0);
   const totalFlagged = useRef(0);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   /* Spawn a packet only if incoming < MAX */
   const spawnPacket = useCallback(() => {
@@ -253,8 +258,9 @@ export default function FramerDemo() {
     });
   }, []);
 
-  /* Pipeline timers */
+  /* Pipeline timers - only run after client mount */
   useEffect(() => {
+    if (!mounted) return;
     const spawnInterval = setInterval(spawnPacket, 700);
 
     /* incoming -> reviewing (only if reviewing has space) */
@@ -318,13 +324,21 @@ export default function FramerDemo() {
       clearInterval(trimVerified);
       clearInterval(trimFlagged);
     };
-  }, [spawnPacket]);
+  }, [mounted, spawnPacket]);
 
   /* Partition */
   const incoming = packets.filter((p) => p.status === "incoming");
   const reviewing = packets.filter((p) => p.status === "reviewing");
   const verified = packets.filter((p) => p.status === "verified");
   const flagged = packets.filter((p) => p.status === "flagged");
+
+  if (!mounted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-background p-8 font-sans">
