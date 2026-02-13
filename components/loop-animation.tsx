@@ -6,7 +6,6 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 /* ──────────────────────────────────────
    Types & constants
    ────────────────────────────────────── */
-// Added intermediate statuses for color transition in review lane
 type PacketStatus = "incoming" | "reviewing" | "reviewing-verified" | "reviewing-flagged" | "verified" | "flagged";
 
 interface Packet {
@@ -93,75 +92,83 @@ const SECTOR_COLORS: Record<Packet["sector"], string> = {
 };
 
 /* ──────────────────────────────────────
-   Animation variants
+   Animation variants (Dynamic based on mobile)
    ────────────────────────────────────── */
-const incomingVariants: Variants = {
-    initial: { x: -60, opacity: 0, scale: 0.85 },
+const getIncomingVariants = (isMobile: boolean): Variants => ({
+    initial: isMobile ? { y: -60, opacity: 0, scale: 0.85 } : { x: -60, opacity: 0, scale: 0.85 },
     animate: {
         x: 0,
+        y: 0,
         opacity: 1,
         scale: 1,
-        transition: { type: "spring", stiffness: 100, damping: 18 }, // Slower spring
+        transition: { type: "spring", stiffness: 100, damping: 18 },
     },
-    exit: {
+    exit: isMobile ? {
+        y: 40,
+        opacity: 0,
+        scale: 0.9,
+        transition: { duration: 0.4, ease: "easeIn" },
+    } : {
         x: 40,
         opacity: 0,
         scale: 0.9,
-        transition: { duration: 0.4, ease: "easeIn" }, // Slower exit
+        transition: { duration: 0.4, ease: "easeIn" },
     },
-};
+});
 
-const reviewingVariants: Variants = {
-    initial: { x: -40, opacity: 0, scale: 0.92 },
+const getReviewingVariants = (isMobile: boolean): Variants => ({
+    initial: isMobile ? { y: -40, opacity: 0, scale: 0.92 } : { x: -40, opacity: 0, scale: 0.92 },
     animate: {
         x: 0,
+        y: 0,
         opacity: 1,
         scale: 1,
-        transition: { type: "spring", stiffness: 160, damping: 22 }, // Slower
+        transition: { type: "spring", stiffness: 160, damping: 22 },
     },
     exit: (status: string) => {
-        // When exiting to verified/flagged, we use different animations
         if (status === "verified" || status === "reviewing-verified") {
-            return { x: 40, opacity: 0, transition: { duration: 0.4, ease: "easeIn" } };
+            return isMobile
+                ? { y: 40, opacity: 0, transition: { duration: 0.4, ease: "easeIn" } }
+                : { x: 40, opacity: 0, transition: { duration: 0.4, ease: "easeIn" } };
         }
         return {
             y: 30,
-            x: -15,
+            x: isMobile ? 0 : -15,
             opacity: 0,
             rotate: -6,
             transition: { duration: 0.45, ease: "easeIn" },
         };
     },
-};
+});
 
-const verifiedVariants: Variants = {
-    initial: { x: -30, opacity: 0 },
+const getVerifiedVariants = (isMobile: boolean): Variants => ({
+    initial: isMobile ? { y: -30, opacity: 0 } : { x: -30, opacity: 0 },
     animate: {
         x: 0,
-        opacity: 1,
-        transition: { type: "spring", stiffness: 120, damping: 20 }, // Slower
-    },
-    exit: {
-        opacity: 0,
-        scale: 0.95, // Subtle scale
-        // INSTANT exit matches "no fading 4th one" request for overflow
-        transition: { duration: 0 },
-    },
-};
-
-const flaggedVariants: Variants = {
-    initial: { y: -20, opacity: 0 },
-    animate: {
         y: 0,
         opacity: 1,
-        transition: { type: "spring", stiffness: 140, damping: 16 }, // Slower
+        transition: { type: "spring", stiffness: 120, damping: 20 },
     },
     exit: {
         opacity: 0,
         scale: 0.95,
-        transition: { duration: 0 }, // INSTANT exit
+        transition: { duration: 0 },
     },
-};
+});
+
+const getFlaggedVariants = (isMobile: boolean): Variants => ({
+    initial: { y: -20, opacity: 0 }, // Same for both usually ok, but consistent
+    animate: {
+        y: 0,
+        opacity: 1,
+        transition: { type: "spring", stiffness: 140, damping: 16 },
+    },
+    exit: {
+        opacity: 0,
+        scale: 0.95,
+        transition: { duration: 0 },
+    },
+});
 
 /* ──────────────────────────────────────
    Packet chip
@@ -187,11 +194,11 @@ function PacketChip({
             bg: "rgba(250,204,80,0.06)",
             border: "rgba(250,204,80,0.3)",
         },
-        "reviewing-verified": { // Green-ish state in review
-            bg: "rgba(100,232,203,0.15)", // Slightly stronger to show transition
+        "reviewing-verified": {
+            bg: "rgba(100,232,203,0.15)",
             border: "rgba(100,232,203,0.5)",
         },
-        "reviewing-flagged": { // Red-ish state in review
+        "reviewing-flagged": {
             bg: "rgba(255,110,130,0.15)",
             border: "rgba(255,110,130,0.5)",
         },
@@ -218,12 +225,12 @@ function PacketChip({
             style={{
                 background: c.bg,
                 border: `1px solid ${c.border}`,
-                transition: "background 0.3s, border-color 0.3s" // Smooth color transition
+                transition: "background 0.3s, border-color 0.3s"
             }}
-            className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 shadow-sm"
+            className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 shadow-sm w-full"
         >
             {icon}
-            <div className="flex flex-col gap-0 min-w-0">
+            <div className="flex flex-col gap-0 min-w-0 flex-1">
                 <span className="text-[11px] font-medium text-foreground/90 truncate leading-tight">
                     {packet.label}
                 </span>
@@ -244,10 +251,15 @@ function PacketChip({
 export function LoopAnimation() {
     const [mounted, setMounted] = useState(false);
     const [packets, setPackets] = useState<Packet[]>([]);
+    const [isMobile, setIsMobile] = useState(false);
     const nextId = useRef(0);
 
     useEffect(() => {
         setMounted(true);
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
     const spawnPacket = useCallback(() => {
@@ -267,15 +279,12 @@ export function LoopAnimation() {
     useEffect(() => {
         if (!mounted) return;
 
-        // Slower intervals (approx +10-20%)
+        // Slower intervals
         const spawnInterval = setInterval(spawnPacket, 950);
-
-        /* incoming -> reviewing */
         const reviewTimer = setInterval(() => {
             setPackets((prev) => {
                 const reviewingCount = prev.filter((p) => p.status.startsWith("reviewing")).length;
                 if (reviewingCount >= MAX_REVIEWING) return prev;
-
                 const idx = prev.findIndex((p) => p.status === "incoming");
                 if (idx === -1) return prev;
                 const copy = [...prev];
@@ -284,48 +293,30 @@ export function LoopAnimation() {
             });
         }, 1150);
 
-        /* reviewing -> transition color -> decision */
-        // We split decision into two steps: 
-        // 1. Change color (reviewing -> reviewing-verified/flagged)
-        // 2. Move lane (reviewing-X -> verified/flagged)
-
-        // This timer picks a random reviewing item and starts its transition
         const transitionTimer = setInterval(() => {
             setPackets((prev) => {
-                // Find a 'reviewing' item that hasn't started transition yet
                 const candidates = prev.filter(p => p.status === "reviewing");
                 if (candidates.length === 0) return prev;
-
-                // Pick the oldest one to move forward? Or random? 
-                // FIFO is better for flow.
                 const target = candidates[0];
-
                 const isFlagged = Math.random() < FLAG_RATE;
                 const nextStatus: PacketStatus = isFlagged ? "reviewing-flagged" : "reviewing-verified";
-
                 return prev.map(p => p.id === target.id ? { ...p, status: nextStatus } : p);
             });
-        }, 1400); // Slower cycle
+        }, 1400);
 
-        // This timer moves transitioning items to their final lanes
         const moveTimer = setInterval(() => {
             setPackets((prev) => {
-                // Find items in transition state
                 const transitioning = prev.filter(p => p.status === "reviewing-verified" || p.status === "reviewing-flagged");
                 if (transitioning.length === 0) return prev;
 
-                // Process one at a time to stagger
                 const target = transitioning[0];
                 const finalStatus = target.status === "reviewing-verified" ? "verified" : "flagged";
 
                 let copy = [...prev];
-
-                // Enforce limits BEFORE moving
                 if (finalStatus === "verified") {
                     const verified = copy.filter(p => p.status === "verified");
                     if (verified.length >= MAX_VERIFIED) {
-                        // Remove oldest verified instantly
-                        const oldest = verified[0]; // Assuming sorted by insertion mostly
+                        const oldest = verified[0];
                         copy = copy.filter(p => p.id !== oldest.id);
                     }
                 } else {
@@ -335,24 +326,19 @@ export function LoopAnimation() {
                         copy = copy.filter(p => p.id !== oldest.id);
                     }
                 }
-
-                // Update target status
                 return copy.map(p => p.id === target.id ? { ...p, status: finalStatus } : p);
             });
-        }, 800); // Check frequently to move them along after color change
+        }, 800);
 
-        // Clean up verified/flagged if they sit too long (optional safety)
         const cleanupLimit = setInterval(() => {
             setPackets(prev => {
                 let copy = [...prev];
                 const verified = copy.filter(p => p.status === "verified");
                 if (verified.length > MAX_VERIFIED) {
                     const toRemove = verified.length - MAX_VERIFIED;
-                    // Remove oldest 'toRemove' items
                     const idsToRemove = verified.slice(0, toRemove).map(p => p.id);
                     copy = copy.filter(p => !idsToRemove.includes(p.id));
                 }
-                // Same for flagged...
                 const flagged = copy.filter(p => p.status === "flagged");
                 if (flagged.length > MAX_FLAGGED) {
                     const toRemove = flagged.length - MAX_FLAGGED;
@@ -372,9 +358,9 @@ export function LoopAnimation() {
         };
     }, [mounted, spawnPacket]);
 
+
     /* Partition */
     const incoming = packets.filter((p) => p.status === "incoming");
-    // All reviewing states stay in the middle lane
     const reviewing = packets.filter((p) => p.status.startsWith("reviewing"));
     const verified = packets.filter((p) => p.status === "verified");
     const flagged = packets.filter((p) => p.status === "flagged");
@@ -390,36 +376,37 @@ export function LoopAnimation() {
     return (
         <div className="flex w-full flex-col items-center justify-center gap-6 font-sans">
             {/* Pipeline lanes */}
-            <div className="flex w-full max-w-[900px] items-start gap-4">
+            <div className={`flex w-full max-w-[900px] items-start gap-4 transition-all duration-300 ${isMobile ? "flex-col items-center" : "flex-row"}`}>
                 {/* Incoming */}
                 <Lane
                     title="AI Output"
                     color="#81aefc"
                     icon={<AiIcon color="#81aefc" />}
+                    className={isMobile ? "w-full max-w-sm min-h-[160px]" : ""}
                 >
                     <AnimatePresence mode="popLayout">
                         {incoming.map((p) => (
                             <PacketChip
                                 key={p.id}
                                 packet={p}
-                                variants={incomingVariants}
+                                variants={getIncomingVariants(isMobile)}
                                 icon={<AiIcon color="#81aefc" />}
                             />
                         ))}
                     </AnimatePresence>
                 </Lane>
 
-                <Arrow color="#81aefc" />
+                <Arrow color="#81aefc" rotate={isMobile} />
 
                 {/* Reviewing */}
                 <Lane
                     title="Human Review"
                     color="#facc50"
                     icon={<HumanIcon color="#facc50" />}
+                    className={isMobile ? "w-full max-w-sm min-h-[160px]" : ""}
                 >
                     <AnimatePresence mode="popLayout">
                         {reviewing.map((p) => {
-                            // Dynamically set icon color based on status
                             let iconColor = "#facc50";
                             if (p.status === "reviewing-verified") iconColor = "#64e8cb";
                             if (p.status === "reviewing-flagged") iconColor = "#ff6e82";
@@ -428,7 +415,7 @@ export function LoopAnimation() {
                                 <PacketChip
                                     key={p.id}
                                     packet={p}
-                                    variants={reviewingVariants}
+                                    variants={getReviewingVariants(isMobile)}
                                     icon={<HumanIcon color={iconColor} />}
                                 />
                             );
@@ -437,31 +424,36 @@ export function LoopAnimation() {
                 </Lane>
 
                 {/* Fork arrows */}
-                <div className="flex flex-col items-center pt-8">
-                    <div className="flex h-[110px] items-center">
-                        <Arrow color="#64e8cb" />
+                {isMobile ? (
+                    <div className="flex flex-col items-center py-2">
+                        <Arrow color="#64e8cb" rotate />
                     </div>
-                    <div className="mt-2 flex h-[110px] items-center">
-                        <Arrow color="#ff6e82" />
+                ) : (
+                    <div className="flex flex-col items-center pt-8">
+                        <div className="flex h-[110px] items-center">
+                            <Arrow color="#64e8cb" />
+                        </div>
+                        <div className="mt-2 flex h-[110px] items-center">
+                            <Arrow color="#ff6e82" />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Outcomes */}
-                <div className="flex flex-1 flex-col gap-3">
+                <div className={`flex flex-1 flex-col gap-3 ${isMobile ? "w-full max-w-sm" : ""}`}>
                     <Lane
                         title="Verified"
                         color="#64e8cb"
                         icon={<CheckIcon color="#64e8cb" />}
                         compact
+                        className={isMobile ? "min-h-[90px]" : ""}
                     >
-                        {/* We use popLayout to allow layout animations for incoming, 
-                             BUT we want exit to be instant. */}
                         <AnimatePresence mode="popLayout" initial={false}>
                             {verified.map((p) => (
                                 <PacketChip
                                     key={p.id}
                                     packet={p}
-                                    variants={verifiedVariants}
+                                    variants={getVerifiedVariants(isMobile)}
                                     icon={<CheckIcon color="#64e8cb" />}
                                 />
                             ))}
@@ -473,13 +465,14 @@ export function LoopAnimation() {
                         color="#ff6e82"
                         icon={<FlagIcon color="#ff6e82" />}
                         compact
+                        className={isMobile ? "min-h-[90px]" : ""}
                     >
                         <AnimatePresence mode="popLayout" initial={false}>
                             {flagged.map((p) => (
                                 <PacketChip
                                     key={p.id}
                                     packet={p}
-                                    variants={flaggedVariants}
+                                    variants={getFlaggedVariants(isMobile)}
                                     icon={<FlagIcon color="#ff6e82" />}
                                 />
                             ))}
@@ -491,13 +484,13 @@ export function LoopAnimation() {
     );
 }
 
-// ... Sub-components remain mostly same, just ensuring no extra inline styles
 function Lane({
     title,
     color,
     icon,
     compact,
     children,
+    className = "",
 }: {
     title: string;
     count?: number;
@@ -506,9 +499,10 @@ function Lane({
     icon: React.ReactNode;
     compact?: boolean;
     children: React.ReactNode;
+    className?: string;
 }) {
     return (
-        <div className={`flex flex-1 flex-col gap-1.5`}>
+        <div className={`flex flex-1 flex-col gap-1.5 ${className}`}>
             <div className="flex items-center gap-2 px-1">
                 {icon}
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -528,12 +522,12 @@ function Lane({
     );
 }
 
-function Arrow({ color }: { color: string }) {
+function Arrow({ color, rotate }: { color: string, rotate?: boolean }) {
     return (
-        <div className="flex items-center px-1">
+        <div className={`flex items-center px-1 ${rotate ? "rotate-90 py-2" : ""}`}>
             <motion.div
                 animate={{ x: [0, 3, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }} // Slower
+                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
             >
                 <svg width="24" height="12" viewBox="0 0 32 16" fill="none">
                     <path
