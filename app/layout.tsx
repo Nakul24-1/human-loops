@@ -32,8 +32,8 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Human Loops",
-    url: "https://humanloops.com",
-    logo: "https://humanloops.com/human-loop-logo.svg",
+    url: "https://thehumanloops.com",
+    logo: "https://thehumanloops.com/human-loop-logo.svg",
     description: "Human-in-the-Loop QA for AI at Scale. We verify, correct, and deliver accurate data for legal, healthcare, and finance AI agents.",
     sameAs: [
       "https://www.linkedin.com/company/human-loops/",
