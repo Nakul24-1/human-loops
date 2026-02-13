@@ -4,10 +4,10 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 /*
  * Pipeline diagram with sequential animation:
- *   Phase 1 ("incoming"):  3 neutral pills travel AI -> Human
- *   Phase 2 ("reviewing"):  Brief pause at Human node
- *   Phase 3a ("approved"):  3 green pills travel Human -> Delivered
- *   Phase 3b ("flagged"):   3 red pills travel Human -> back to AI
+ * Phase 1 ("incoming"):  3 neutral pills travel AI -> Human
+ * Phase 2 ("reviewing"):  Brief pause at Human node
+ * Phase 3a ("approved"):  3 green pills travel Human -> Delivered
+ * Phase 3b ("flagged"):   3 red pills travel Human -> back to AI
  *
  * Phases alternate between approved and flagged outcomes each cycle.
  */
@@ -221,20 +221,21 @@ export function LoopSVG() {
       <text
         x="310" y="255"
         textAnchor="middle"
-        fill="rgba(255,160,175,0.45)"
-        fontSize="10"
+        fill="rgba(255,160,175,0.9)"
+        fontSize="12"
         fontFamily="Inter, system-ui, sans-serif"
-        fontWeight="500"
-        style={{ opacity: !isApproved && isOutgoing ? 0.9 : 0.3, transition: "opacity 0.6s" }}
+        fontWeight="600"
+        style={{ opacity: !isApproved && isOutgoing ? 1 : 0.6, transition: "opacity 0.6s" }}
       >
         Returned for correction
       </text>
 
+
       {/* ===== NODE: AI OUTPUT ===== */}
       <g transform="translate(20, 108)">
-        <rect width="120" height="64" rx="12" fill="rgba(12,20,38,0.9)" stroke="rgba(142,172,220,0.25)" strokeWidth="1" />
+        <rect width="130" height="64" rx="12" fill="rgba(12,20,38,0.9)" stroke="rgba(142,172,220,0.25)" strokeWidth="1" />
         {/* CPU icon */}
-        <g transform="translate(14, 18)">
+        <g transform="translate(14, 21)">
           <rect x="2" y="2" width="18" height="18" rx="3" fill="none" stroke="rgba(142,172,220,0.6)" strokeWidth="1.2" />
           <circle cx="11" cy="11" r="3.5" fill="none" stroke="rgba(142,172,220,0.5)" strokeWidth="1" />
           <line x1="6" y1="0" x2="6" y2="2" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
@@ -244,10 +245,11 @@ export function LoopSVG() {
           <line x1="11" y1="20" x2="11" y2="22" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
           <line x1="16" y1="20" x2="16" y2="22" stroke="rgba(142,172,220,0.4)" strokeWidth="1" />
         </g>
-        <text x="60" y="32" textAnchor="middle" fill="rgba(200,216,240,0.95)" fontSize="13" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
+        {/* ALIGNED TEXT LEFT */}
+        <text x="46" y="28" textAnchor="start" fill="rgba(200,216,240,0.95)" fontSize="13" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
           AI Output
         </text>
-        <text x="60" y="48" textAnchor="middle" fill="rgba(142,172,220,0.5)" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif">
+        <text x="46" y="44" textAnchor="start" fill="rgba(142,172,220,0.5)" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif">
           Raw content
         </text>
       </g>
@@ -270,17 +272,15 @@ export function LoopSVG() {
           style={{ transition: "stroke 0.6s" }}
         />
         {/* Person icon */}
-        <g transform="translate(18, 20)">
+        <g transform="translate(20, 32)">
           <circle cx="10" cy="8" r="6" fill="none" stroke="rgba(200,216,240,0.6)" strokeWidth="1.3" />
           <path d="M0 28 C0 20, 20 20, 20 28" fill="none" stroke="rgba(200,216,240,0.6)" strokeWidth="1.3" />
         </g>
-        <text x="75" y="36" textAnchor="middle" fill="#edf3ff" fontSize="13.5" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
-          Human
+        {/* ALIGNED TEXT LEFT */}
+        <text x="54" y="38" textAnchor="start" fill="#edf3ff" fontSize="13.5" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
+          Human Review
         </text>
-        <text x="75" y="52" textAnchor="middle" fill="#edf3ff" fontSize="13.5" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
-          Review
-        </text>
-        <text x="75" y="72" textAnchor="middle" fill="rgba(175,189,216,0.6)" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif">
+        <text x="54" y="58" textAnchor="start" fill="rgba(175,189,216,0.6)" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif">
           Verify &amp; correct
         </text>
       </g>
@@ -304,7 +304,7 @@ export function LoopSVG() {
         />
         {isApproved ? (
           <>
-            <g transform="translate(10, 6)">
+            <g transform="translate(12, 6)">
               <circle cx="9" cy="9" r="7.5" fill="none" stroke="#67e7cc" strokeWidth="1.5"
                 style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
               />
@@ -312,7 +312,8 @@ export function LoopSVG() {
                 style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
               />
             </g>
-            <text x="60" y="20" textAnchor="start" fontSize="12" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
+            {/* FIXED: Left-aligned text next to icon to prevent bleeding */}
+            <text x="34" y="15" dominantBaseline="central" textAnchor="start" fontSize="12" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
               fill="#b8fce6"
               style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
             >
@@ -321,7 +322,7 @@ export function LoopSVG() {
           </>
         ) : (
           <>
-            <g transform="translate(10, 5)">
+            <g transform="translate(12, 5)">
               <line x1="5" y1="4" x2="5" y2="18" stroke="#ff8c9e" strokeWidth="2" strokeLinecap="round"
                 style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
               />
@@ -329,7 +330,8 @@ export function LoopSVG() {
                 style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
               />
             </g>
-            <text x="56" y="20" textAnchor="start" fontSize="12" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
+            {/* FIXED: Left-aligned text next to icon to prevent bleeding */}
+            <text x="34" y="15" dominantBaseline="central" textAnchor="start" fontSize="12" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
               fill="#ffd0d6"
               style={{ opacity: isOutgoing || isReviewing ? 1 : 0.3, transition: "opacity 0.6s" }}
             >
@@ -341,25 +343,26 @@ export function LoopSVG() {
 
       {/* ===== NODE: DELIVERED ===== */}
       <g transform="translate(760, 108)">
-        <rect width="120" height="64" rx="12"
+        <rect width="130" height="64" rx="12"
           fill="rgba(12,20,38,0.9)"
           stroke="rgba(100,232,203,0.25)" strokeWidth="1"
           style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
         />
         {/* Checkmark doc icon */}
-        <g transform="translate(14, 16)"
+        <g transform="translate(14, 19)"
           style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
         >
           <rect x="2" y="1" width="16" height="20" rx="2.5" fill="none" stroke="rgba(100,232,203,0.6)" strokeWidth="1.2" />
           <path d="M6 11 L9 14 L14 8" fill="none" stroke="rgba(100,232,203,0.7)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </g>
-        <text x="60" y="32" textAnchor="middle" fontSize="13" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
+        {/* ALIGNED TEXT LEFT */}
+        <text x="46" y="28" textAnchor="start" fontSize="13" fontWeight="700" fontFamily="Inter, system-ui, sans-serif"
           fill="rgba(200,240,228,0.95)"
           style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
         >
           Delivered
         </text>
-        <text x="60" y="48" textAnchor="middle" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif"
+        <text x="46" y="44" textAnchor="start" fontSize="9.5" fontFamily="Inter, system-ui, sans-serif"
           fill="rgba(100,232,203,0.45)"
           style={{ opacity: isApproved || !isOutgoing ? 1 : 0.3, transition: "opacity 0.6s" }}
         >

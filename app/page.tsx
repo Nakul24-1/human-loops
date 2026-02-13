@@ -1,5 +1,6 @@
 import { LoopSVG } from "@/components/loop-svg";
 import { Hero } from "@/components/hero";
+import { Socials } from "@/components/socials";
 
 export default function Home() {
   return (
@@ -20,6 +21,8 @@ export default function Home() {
       <div className="flex w-full flex-1 items-start justify-center px-6 pb-10">
         <LoopSVG />
       </div>
+
+      <Socials />
     </div>
   );
 }

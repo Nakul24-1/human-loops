@@ -27,7 +27,6 @@ export function Hero() {
           href="https://calendly.com/shloak/introductory-call?month=2026-02"
           className="inline-block rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground no-underline transition-opacity hover:opacity-90"
           target="_blank"
-          rel="noopener noreferrer"
         >
           Book a meeting
         </a>

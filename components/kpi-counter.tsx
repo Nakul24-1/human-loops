@@ -31,7 +31,7 @@ export function KpiCounter({ label, target }: KpiCounterProps) {
   return (
     <article className="rounded-[14px] border border-border bg-card px-3.5 py-3">
       <p className="m-0 text-xs text-[#c0cee9]">{label}</p>
-      <p className="m-0 mt-1.5 text-2xl font-bold text-card-foreground">
+      <p className="m-0 mt-1.5 text-2xl font-bold text-card-foreground break-all">
         {value.toLocaleString()}+
       </p>
     </article>
