@@ -33,10 +33,10 @@ const TASK_POOL: { label: string; sector: Packet["sector"] }[] = [
   { label: "Audit trail check", sector: "finance" },
 ];
 
-const MAX_INCOMING = 10;
-const MAX_REVIEWING = 10;
-const MAX_VERIFIED = 5;
-const MAX_FLAGGED = 5;
+const MAX_INCOMING = 6;
+const MAX_REVIEWING = 6;
+const MAX_VERIFIED = 3;
+const MAX_FLAGGED = 3;
 
 const FLAG_RATE = 0.25;
 
@@ -395,10 +395,14 @@ export default function FramerDemo() {
           </AnimatePresence>
         </Lane>
 
-        {/* Fork arrows */}
-        <div className="flex flex-col items-center gap-8 pt-12">
-          <Arrow color="#64e8cb" />
-          <Arrow color="#ff6e82" rotate />
+        {/* Fork arrows aligned to verified/flagged lanes */}
+        <div className="flex flex-col items-center pt-12">
+          <div className="flex h-[140px] items-center">
+            <Arrow color="#64e8cb" />
+          </div>
+          <div className="mt-4 flex h-[140px] items-center">
+            <Arrow color="#ff6e82" />
+          </div>
         </div>
 
         {/* Outcomes */}
@@ -505,12 +509,9 @@ function Lane({
   );
 }
 
-function Arrow({ color, rotate }: { color: string; rotate?: boolean }) {
+function Arrow({ color }: { color: string }) {
   return (
-    <div
-      className="flex items-center pt-14"
-      style={rotate ? { transform: "rotate(28deg)", marginTop: 8 } : undefined}
-    >
+    <div className="flex items-center">
       <motion.div
         animate={{ x: [0, 5, 0] }}
         transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
