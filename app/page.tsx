@@ -1,28 +1,49 @@
-import { LoopAnimation } from "@/components/loop-animation";
-import { Hero } from "@/components/hero";
-import { Socials } from "@/components/socials";
+import MeshGradientBG from '@/components/MeshGradientBG'
+import LightStreams from '@/components/LightStreams'
+import GlowOrb from '@/components/GlowOrb'
+import Navbar from '@/components/Navbar'
+import Hero from '@/components/Hero'
+import { LoopAnimation } from '@/components/loop-animation'
+import AnimatedSection from '@/components/AnimatedSection'
+import TrustTicker from '@/components/TrustTicker'
+import Positioning from '@/components/Positioning'
+import Industries from '@/components/Industries'
+import Work from '@/components/Work'
+import Vision from '@/components/Vision'
+import Team from '@/components/Team'
+import Careers from '@/components/Careers'
+import CTA from '@/components/CTA'
+import Footer from '@/components/Footer'
 
 export default function Home() {
   return (
-    <div
-      className="flex min-h-screen flex-col"
-      style={{
-        background: `
-          radial-gradient(700px 380px at 15% 10%, rgba(52, 98, 199, 0.2), transparent 70%),
-          radial-gradient(620px 360px at 85% 0%, rgba(63, 179, 157, 0.14), transparent 75%),
-          linear-gradient(180deg, #080f1f 0%, #050914 65%)
-        `,
-      }}
-    >
-      {/* Hero text content */}
+    <>
+      {/* Background layers */}
+      <MeshGradientBG />
+      <LightStreams />
+      <GlowOrb />
+
+      {/* Content */}
+      <Navbar />
       <Hero />
 
-      {/* Pipeline diagram -- separate section, not overlapping */}
-      <div className="flex w-full flex-1 items-start justify-center px-4 pb-4">
-        <LoopAnimation />
-      </div>
+      {/* Pipeline Animation — fixed height to prevent layout shifts */}
+      <AnimatedSection className="loop-hero-section" delay={0.3}>
+        <div className="loop-hero-label">How the Loop Works</div>
+        <div className="loop-fixed-container">
+          <LoopAnimation />
+        </div>
+      </AnimatedSection>
 
-      <Socials />
-    </div>
-  );
+      <TrustTicker />
+      <Positioning />
+      <Industries />
+      <Work />
+      <Vision />
+      <Team />
+      <Careers />
+      <CTA />
+      <Footer />
+    </>
+  )
 }
