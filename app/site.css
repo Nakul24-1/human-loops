@@ -703,7 +703,7 @@ section h2 {
 /* ---------- TEAM ---------- */
 .team-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1.3fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 12px;
   height: 440px;
@@ -713,33 +713,24 @@ section h2 {
 .photo-slot {
   background: #0d0d0d;
   border-radius: var(--radius);
-  display: flex;
-  align-items: flex-end;
-  padding: 16px;
   position: relative;
   overflow: hidden;
 }
 
-.photo-slot::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(45deg, #070707 0, #070707 5px, #0d0d0d 5px, #0d0d0d 10px);
-  border-radius: var(--radius);
+.photo-img {
+  transition: transform 0.8s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.photo-slot:hover .photo-img {
+  transform: scale(1.05);
 }
 
 .photo-slot.tall {
   grid-row: span 2;
 }
 
-.photo-label {
-  position: relative;
-  z-index: 1;
-  font-size: 10px;
-  color: var(--g);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-weight: 600;
+.photo-slot.wide {
+  grid-column: span 2;
 }
 
 .team-caption {
@@ -1315,12 +1306,16 @@ section h2 {
   }
 
   .photo-slot {
-    min-height: 120px;
+    min-height: 160px;
   }
 
   .photo-slot.tall {
     grid-row: auto;
-    min-height: 180px;
+    min-height: 240px;
+  }
+
+  .photo-slot.wide {
+    grid-column: auto;
   }
 
   .jobs-grid {
