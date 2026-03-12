@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from 'framer-motion'
-import ConfluenceCanvas from './ConfluenceCanvas'
+import { LoopAnimation } from './loop-animation'
 
 export default function Hero() {
     return (
@@ -21,8 +21,9 @@ export default function Hero() {
                     <a href="#pos" className="btn-secondary">How It Works</a>
                 </motion.div>
             </div>
-            <motion.div className="hero-right" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.4 }}>
-                <ConfluenceCanvas />
+            <motion.div className="hero-right" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
+                <div className="hero-loop-label">How the Loop Works</div>
+                <LoopAnimation />
             </motion.div>
         </section>
     )

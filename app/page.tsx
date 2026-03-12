@@ -3,7 +3,6 @@ import LightStreams from '@/components/LightStreams'
 import GlowOrb from '@/components/GlowOrb'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
-import { LoopAnimation } from '@/components/loop-animation'
 import AnimatedSection from '@/components/AnimatedSection'
 import TrustTicker from '@/components/TrustTicker'
 import Positioning from '@/components/Positioning'
@@ -23,17 +22,10 @@ export default function Home() {
       <LightStreams />
       <GlowOrb />
 
+
       {/* Content */}
       <Navbar />
       <Hero />
-
-      {/* Pipeline Animation — fixed height to prevent layout shifts */}
-      <AnimatedSection className="loop-hero-section" delay={0.3}>
-        <div className="loop-hero-label">How the Loop Works</div>
-        <div className="loop-fixed-container">
-          <LoopAnimation />
-        </div>
-      </AnimatedSection>
 
       <TrustTicker />
       <Positioning />

@@ -33,15 +33,15 @@ const TASK_POOL: { label: string; sector: Packet["sector"] }[] = [
     { label: "Audit trail check", sector: "finance" },
 ];
 
-const MAX_INCOMING = 6;
-const MAX_REVIEWING = 6;
+const MAX_INCOMING = 3;
+const MAX_REVIEWING = 3;
 const MAX_VERIFIED = 3;
 const MAX_FLAGGED = 3;
 
 const FLAG_RATE = 0.25;
 
 /* ──────────────────────────────────────
-   Icons (inline SVGs matching loop-svg)
+   Icons (inline SVGs)
    ────────────────────────────────────── */
 function AiIcon({ color }: { color: string }) {
     return (
@@ -86,65 +86,55 @@ function FlagIcon({ color }: { color: string }) {
 }
 
 const SECTOR_COLORS: Record<Packet["sector"], string> = {
-    legal: "rgba(168,148,255,0.6)",
-    healthcare: "rgba(100,200,255,0.6)",
-    finance: "rgba(255,200,100,0.6)",
+    legal: "rgba(168,148,255,0.7)",
+    healthcare: "rgba(100,200,255,0.7)",
+    finance: "rgba(255,200,100,0.7)",
 };
 
 /* ──────────────────────────────────────
-   Animation variants (Dynamic based on mobile)
+   Animation variants — always vertical
    ────────────────────────────────────── */
-const getIncomingVariants = (isMobile: boolean): Variants => ({
-    initial: isMobile ? { y: -60, opacity: 0, scale: 0.85 } : { x: -60, opacity: 0, scale: 0.85 },
+const incomingVariants: Variants = {
+    initial: { y: -40, opacity: 0, scale: 0.9 },
     animate: {
-        x: 0,
         y: 0,
         opacity: 1,
         scale: 1,
-        transition: { type: "spring", stiffness: 100, damping: 18 },
+        transition: { type: "spring", stiffness: 120, damping: 18 },
     },
-    exit: isMobile ? {
-        y: 40,
+    exit: {
+        y: 30,
         opacity: 0,
-        scale: 0.9,
-        transition: { duration: 0.4, ease: "easeIn" },
-    } : {
-        x: 40,
-        opacity: 0,
-        scale: 0.9,
-        transition: { duration: 0.4, ease: "easeIn" },
+        scale: 0.92,
+        transition: { duration: 0.35, ease: "easeIn" },
     },
-});
+};
 
-const getReviewingVariants = (isMobile: boolean): Variants => ({
-    initial: isMobile ? { y: -40, opacity: 0, scale: 0.92 } : { x: -40, opacity: 0, scale: 0.92 },
+const reviewingVariants: Variants = {
+    initial: { y: -30, opacity: 0, scale: 0.92 },
     animate: {
-        x: 0,
         y: 0,
         opacity: 1,
         scale: 1,
-        transition: { type: "spring", stiffness: 160, damping: 22 },
+        transition: { type: "spring", stiffness: 150, damping: 20 },
     },
     exit: (status: string) => {
         if (status === "verified" || status === "reviewing-verified") {
-            return isMobile
-                ? { y: 40, opacity: 0, transition: { duration: 0.4, ease: "easeIn" } }
-                : { x: 40, opacity: 0, transition: { duration: 0.4, ease: "easeIn" } };
+            return { y: 30, opacity: 0, transition: { duration: 0.35, ease: "easeIn" } };
         }
         return {
-            y: 30,
-            x: isMobile ? 0 : -15,
+            y: 20,
+            x: -10,
             opacity: 0,
-            rotate: -6,
-            transition: { duration: 0.45, ease: "easeIn" },
+            rotate: -4,
+            transition: { duration: 0.4, ease: "easeIn" },
         };
     },
-});
+};
 
-const getVerifiedVariants = (isMobile: boolean): Variants => ({
-    initial: isMobile ? { y: -30, opacity: 0 } : { x: -30, opacity: 0 },
+const verifiedVariants: Variants = {
+    initial: { y: -20, opacity: 0 },
     animate: {
-        x: 0,
         y: 0,
         opacity: 1,
         transition: { type: "spring", stiffness: 120, damping: 20 },
@@ -154,10 +144,10 @@ const getVerifiedVariants = (isMobile: boolean): Variants => ({
         scale: 0.95,
         transition: { duration: 0 },
     },
-});
+};
 
-const getFlaggedVariants = (isMobile: boolean): Variants => ({
-    initial: { y: -20, opacity: 0 }, // Same for both usually ok, but consistent
+const flaggedVariants: Variants = {
+    initial: { y: -20, opacity: 0 },
     animate: {
         y: 0,
         opacity: 1,
@@ -168,7 +158,7 @@ const getFlaggedVariants = (isMobile: boolean): Variants => ({
         scale: 0.95,
         transition: { duration: 0 },
     },
-});
+};
 
 /* ──────────────────────────────────────
    Packet chip
@@ -227,15 +217,15 @@ function PacketChip({
                 border: `1px solid ${c.border}`,
                 transition: "background 0.3s, border-color 0.3s"
             }}
-            className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 shadow-sm w-full"
+            className="loop-chip"
         >
             {icon}
-            <div className="flex flex-col gap-0 min-w-0 flex-1">
-                <span className="text-[11px] font-medium text-foreground/90 truncate leading-tight">
+            <div className="loop-chip-info">
+                <span className="loop-chip-label">
                     {packet.label}
                 </span>
                 <span
-                    className="text-[9px] font-semibold uppercase tracking-wider leading-tight"
+                    className="loop-chip-sector"
                     style={{ color: SECTOR_COLORS[packet.sector] }}
                 >
                     {packet.sector}
@@ -246,20 +236,15 @@ function PacketChip({
 }
 
 /* ──────────────────────────────────────
-   Main Component
+   Main Component — always vertical
    ────────────────────────────────────── */
 export function LoopAnimation() {
     const [mounted, setMounted] = useState(false);
     const [packets, setPackets] = useState<Packet[]>([]);
-    const [isMobile, setIsMobile] = useState(false);
     const nextId = useRef(0);
 
     useEffect(() => {
         setMounted(true);
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
-        return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
     const spawnPacket = useCallback(() => {
@@ -279,8 +264,7 @@ export function LoopAnimation() {
     useEffect(() => {
         if (!mounted) return;
 
-        // Slower intervals
-        const spawnInterval = setInterval(spawnPacket, 950);
+        const spawnInterval = setInterval(spawnPacket, 1100);
         const reviewTimer = setInterval(() => {
             setPackets((prev) => {
                 const reviewingCount = prev.filter((p) => p.status.startsWith("reviewing")).length;
@@ -291,7 +275,7 @@ export function LoopAnimation() {
                 copy[idx] = { ...copy[idx], status: "reviewing" };
                 return copy;
             });
-        }, 1150);
+        }, 1300);
 
         const transitionTimer = setInterval(() => {
             setPackets((prev) => {
@@ -302,7 +286,7 @@ export function LoopAnimation() {
                 const nextStatus: PacketStatus = isFlagged ? "reviewing-flagged" : "reviewing-verified";
                 return prev.map(p => p.id === target.id ? { ...p, status: nextStatus } : p);
             });
-        }, 1400);
+        }, 1500);
 
         const moveTimer = setInterval(() => {
             setPackets((prev) => {
@@ -328,7 +312,7 @@ export function LoopAnimation() {
                 }
                 return copy.map(p => p.id === target.id ? { ...p, status: finalStatus } : p);
             });
-        }, 800);
+        }, 900);
 
         const cleanupLimit = setInterval(() => {
             setPackets(prev => {
@@ -367,118 +351,97 @@ export function LoopAnimation() {
 
     if (!mounted) {
         return (
-            <div className="flex h-[320px] w-full items-center justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+            <div className="loop-loading">
+                <div className="loop-spinner" />
             </div>
         );
     }
 
     return (
-        <div className="flex w-full flex-col items-center justify-center gap-6 font-sans">
-            {/* Pipeline lanes */}
-            <div className={`flex w-full max-w-[900px] items-start gap-4 transition-all duration-300 ${isMobile ? "flex-col items-center" : "flex-row"}`}>
-                {/* Incoming */}
-                <Lane
-                    title="AI Output"
-                    color="#81aefc"
-                    icon={<AiIcon color="#81aefc" />}
-                    className={isMobile ? "w-full max-w-sm min-h-[160px]" : ""}
-                >
-                    <AnimatePresence mode="popLayout">
-                        {incoming.map((p) => (
+        <div className="loop-vertical">
+            {/* AI Output */}
+            <Lane
+                title="AI Output"
+                color="#81aefc"
+                icon={<AiIcon color="#81aefc" />}
+            >
+                <AnimatePresence mode="popLayout">
+                    {incoming.map((p) => (
+                        <PacketChip
+                            key={p.id}
+                            packet={p}
+                            variants={incomingVariants}
+                            icon={<AiIcon color="#81aefc" />}
+                        />
+                    ))}
+                </AnimatePresence>
+            </Lane>
+
+            <VerticalArrow color="#81aefc" />
+
+            {/* Human Review */}
+            <Lane
+                title="Human Review"
+                color="#facc50"
+                icon={<HumanIcon color="#facc50" />}
+            >
+                <AnimatePresence mode="popLayout">
+                    {reviewing.map((p) => {
+                        let iconColor = "#facc50";
+                        if (p.status === "reviewing-verified") iconColor = "#64e8cb";
+                        if (p.status === "reviewing-flagged") iconColor = "#ff6e82";
+
+                        return (
                             <PacketChip
                                 key={p.id}
                                 packet={p}
-                                variants={getIncomingVariants(isMobile)}
-                                icon={<AiIcon color="#81aefc" />}
+                                variants={reviewingVariants}
+                                icon={<HumanIcon color={iconColor} />}
+                            />
+                        );
+                    })}
+                </AnimatePresence>
+            </Lane>
+
+            <VerticalArrow color="#64e8cb" />
+
+            {/* Outcomes — side by side */}
+            <div className="loop-outcomes-row">
+                <Lane
+                    title="Verified"
+                    color="#64e8cb"
+                    icon={<CheckIcon color="#64e8cb" />}
+                    compact
+                >
+                    <AnimatePresence mode="popLayout" initial={false}>
+                        {verified.map((p) => (
+                            <PacketChip
+                                key={p.id}
+                                packet={p}
+                                variants={verifiedVariants}
+                                icon={<CheckIcon color="#64e8cb" />}
                             />
                         ))}
                     </AnimatePresence>
                 </Lane>
 
-                <Arrow color="#81aefc" rotate={isMobile} />
-
-                {/* Reviewing */}
                 <Lane
-                    title="Human Review"
-                    color="#facc50"
-                    icon={<HumanIcon color="#facc50" />}
-                    className={isMobile ? "w-full max-w-sm min-h-[160px]" : ""}
+                    title="Flagged"
+                    color="#ff6e82"
+                    icon={<FlagIcon color="#ff6e82" />}
+                    compact
                 >
-                    <AnimatePresence mode="popLayout">
-                        {reviewing.map((p) => {
-                            let iconColor = "#facc50";
-                            if (p.status === "reviewing-verified") iconColor = "#64e8cb";
-                            if (p.status === "reviewing-flagged") iconColor = "#ff6e82";
-
-                            return (
-                                <PacketChip
-                                    key={p.id}
-                                    packet={p}
-                                    variants={getReviewingVariants(isMobile)}
-                                    icon={<HumanIcon color={iconColor} />}
-                                />
-                            );
-                        })}
+                    <AnimatePresence mode="popLayout" initial={false}>
+                        {flagged.map((p) => (
+                            <PacketChip
+                                key={p.id}
+                                packet={p}
+                                variants={flaggedVariants}
+                                icon={<FlagIcon color="#ff6e82" />}
+                            />
+                        ))}
                     </AnimatePresence>
                 </Lane>
-
-                {/* Fork arrows */}
-                {isMobile ? (
-                    <div className="flex flex-col items-center py-2">
-                        <Arrow color="#64e8cb" rotate />
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center pt-8">
-                        <div className="flex h-[110px] items-center">
-                            <Arrow color="#64e8cb" />
-                        </div>
-                        <div className="mt-2 flex h-[110px] items-center">
-                            <Arrow color="#ff6e82" />
-                        </div>
-                    </div>
-                )}
-
-                {/* Outcomes */}
-                <div className={`flex flex-1 flex-col gap-3 ${isMobile ? "w-full max-w-sm" : ""}`}>
-                    <Lane
-                        title="Verified"
-                        color="#64e8cb"
-                        icon={<CheckIcon color="#64e8cb" />}
-                        compact
-                        className={isMobile ? "min-h-[90px]" : ""}
-                    >
-                        <AnimatePresence mode="popLayout" initial={false}>
-                            {verified.map((p) => (
-                                <PacketChip
-                                    key={p.id}
-                                    packet={p}
-                                    variants={getVerifiedVariants(isMobile)}
-                                    icon={<CheckIcon color="#64e8cb" />}
-                                />
-                            ))}
-                        </AnimatePresence>
-                    </Lane>
-
-                    <Lane
-                        title="Flagged"
-                        color="#ff6e82"
-                        icon={<FlagIcon color="#ff6e82" />}
-                        compact
-                        className={isMobile ? "min-h-[90px]" : ""}
-                    >
-                        <AnimatePresence mode="popLayout" initial={false}>
-                            {flagged.map((p) => (
-                                <PacketChip
-                                    key={p.id}
-                                    packet={p}
-                                    variants={getFlaggedVariants(isMobile)}
-                                    icon={<FlagIcon color="#ff6e82" />}
-                                />
-                            ))}
-                        </AnimatePresence>
-                    </Lane>
-                </div>
             </div>
         </div>
     );
@@ -490,28 +453,24 @@ function Lane({
     icon,
     compact,
     children,
-    className = "",
 }: {
     title: string;
-    count?: number;
-    max?: number;
     color: string;
     icon: React.ReactNode;
     compact?: boolean;
     children: React.ReactNode;
-    className?: string;
 }) {
     return (
-        <div className={`flex flex-1 flex-col gap-1.5 ${className}`}>
-            <div className="flex items-center gap-2 px-1">
+        <div className="loop-lane-v">
+            <div className="loop-lane-header">
                 {icon}
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="loop-lane-title">
                     {title}
                 </span>
             </div>
 
             <div
-                className={`flex ${compact ? "min-h-[100px]" : "min-h-[220px]"} flex-col gap-2 rounded-xl border border-border/50 p-2.5 overflow-hidden transition-all`}
+                className={`loop-lane-body ${compact ? "compact" : ""}`}
                 style={{
                     background: `linear-gradient(135deg, ${color}06, transparent)`,
                 }}
@@ -522,16 +481,16 @@ function Lane({
     );
 }
 
-function Arrow({ color, rotate }: { color: string, rotate?: boolean }) {
+function VerticalArrow({ color }: { color: string }) {
     return (
-        <div className={`flex items-center px-1 ${rotate ? "rotate-90 py-2" : ""}`}>
+        <div className="loop-v-arrow">
             <motion.div
-                animate={{ x: [0, 3, 0] }}
+                animate={{ y: [0, 3, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
             >
-                <svg width="24" height="12" viewBox="0 0 32 16" fill="none">
+                <svg width="12" height="24" viewBox="0 0 16 32" fill="none">
                     <path
-                        d="M0 8h26m0 0l-6-5.5M26 8l-6 5.5"
+                        d="M8 0v26m0 0l-5.5-6M8 26l5.5-6"
                         stroke={color}
                         strokeWidth="2"
                         strokeLinecap="round"

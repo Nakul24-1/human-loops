@@ -9,7 +9,6 @@ export default function CTA() {
             <AnimatedSection delay={0.1}><p className="cta-sub">One call. No decks. Just a conversation about what you need.</p></AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <a href="https://calendly.com/shloak/introductory-call" target="_blank" rel="noopener noreferrer" className="cta-btn-primary">Book a Discovery Call →</a>
-                <a href="mailto:hello@thehumanloops.com" className="cta-btn-secondary">Or email us directly</a>
             </AnimatedSection>
         </section>
     )

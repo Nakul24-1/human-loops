@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 export default function Footer() {
     return (
         <>
@@ -5,7 +7,9 @@ export default function Footer() {
                 <a href="#hero">↑ &nbsp; Back to Top</a>
             </div>
             <footer className="footer">
-                <div className="footer-logo">Human<span>Loops</span></div>
+                <a href="#hero" className="footer-logo-link">
+                    <Image src="/logo.svg" alt="Human Loops" width={100} height={26} className="footer-logo-img" />
+                </a>
                 <nav className="footer-nav">
                     <a href="#pos">What We Do</a>
                     <a href="#ind">Industries</a>

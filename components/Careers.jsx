@@ -5,9 +5,6 @@ import AnimatedSection from './AnimatedSection'
 const JOBS = [
     { title: 'Operations Manager', tags: ['Ops Leadership', 'Nagpur', 'Full-time'] },
     { title: 'Operations Associate', tags: ['HITL Ops', 'Nagpur', 'Full-time'] },
-    { title: 'Operations Associate', tags: ['HITL Ops', 'Nagpur', 'Full-time'] },
-    { title: 'Operations Associate', tags: ['HITL Ops', 'Nagpur', 'Full-time'] },
-    { title: 'Operations Associate', tags: ['HITL Ops', 'Nagpur', 'Full-time'] },
     { title: 'Nurse — Clinical QA', tags: ['Healthcare Ops', 'Nagpur', 'Full-time'] },
     { title: 'Data Labelling Specialist', tags: ['Robotics Ops', 'Nagpur', 'Full-time'] },
     { title: 'Business Development', tags: ['Growth', 'Remote', 'Full-time'] },
