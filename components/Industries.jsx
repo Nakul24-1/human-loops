@@ -9,7 +9,7 @@ const INDUSTRIES = [
         id: 'hc', label: '🏥 Healthcare', name: 'Healthcare',
         sector: 'Clinical · RCM · Prior Auth · Ambient AI',
         desc: 'Healthcare AI moves fast — errors cost lives and dollars. We embed licensed medical professionals directly into your workflows to verify, correct and label at the standard this industry demands.',
-        services: ['Healthcare AI Output Verification', 'Prescription parsing & Rx QA', 'EHR / Clinical Data Migration', 'Prior auth exception handling', 'Denials management & appeals', 'Clinical review prep & utilization management support', 'Patient-facing content QA & compliance review'],
+        services: ['Healthcare AI Output Verification', 'Prescription parsing & Rx QA', 'EHR / Clinical Data Migration', 'Patient-facing content QA & compliance review', 'Image Annotation', 'Video Annotation'],
     },
     {
         id: 'fi', label: '💰 Finance', name: 'Finance',
@@ -17,12 +17,7 @@ const INDUSTRIES = [
         desc: "Financial documents are high-stakes, high-volume and format-chaotic. We QA the outputs your AI can't afford to get wrong — with structured audit trails for every decision made.",
         services: ['Financial Document Extraction QA (K-1s, 1099s, W-2s)', 'Labelling & Manual entry of Invoices', 'Bank statement & income document AI extraction QA', 'Vendor tax form & master data QA', 'Financial Close & Reconciliation QA'],
     },
-    {
-        id: 'ins', label: '🛡️ Insurance', name: 'Insurance',
-        sector: 'Claims · Underwriting · Fraud · Appeals',
-        desc: 'Insurance workflows are built on documentation. We ensure every AI-assisted claim, policy and review is accurate, compliant and audit-ready before it moves downstream.',
-        services: ['Claims document verification', 'Underwriting data QA', 'Fraud signal labelling', 'Appeals & grievance case ops', 'Compliance documentation QA', 'Policy issuance verification', 'Handling Edge Cases'],
-    },
+
     {
         id: 'rob', label: '🤖 Robotics', name: 'Robotics & Autonomous Systems',
         sector: 'Labelling · Edge Cases · Ground Truth · Simulation QA',
@@ -31,7 +26,7 @@ const INDUSTRIES = [
     },
 ]
 
-const EXPANDING = ['🚛 Logistics', '⚖️ Legal Tech', '🛡️ Content Moderation', '🛒 E-Commerce', '🏗️ Real Estate', '+ Any AI workflow that needs a human']
+const EXPANDING = ['Content Moderation', 'Insurance', 'Logistics', 'Real estate']
 
 export default function Industries() {
     const [active, setActive] = useState(0)

@@ -11,10 +11,10 @@ export default function MeshGradientBG() {
         const ctx = canvas.getContext('2d')
         let raf
         const blobs = [
-            { x: 0.2, y: 0.3, r: 400, vx: 0.0003, vy: 0.0002, color: [20, 30, 80] },
-            { x: 0.7, y: 0.5, r: 350, vx: -0.0002, vy: 0.0003, color: [40, 20, 80] },
-            { x: 0.5, y: 0.8, r: 300, vx: 0.0002, vy: -0.0002, color: [15, 50, 60] },
-            { x: 0.3, y: 0.6, r: 280, vx: -0.0003, vy: -0.0001, color: [50, 35, 20] },
+            { x: 0.2, y: 0.3, r: 400, vx: 0.0003, vy: 0.0002, color: [15, 15, 15] },
+            { x: 0.7, y: 0.5, r: 350, vx: -0.0002, vy: 0.0003, color: [25, 25, 25] },
+            { x: 0.5, y: 0.8, r: 300, vx: 0.0002, vy: -0.0002, color: [10, 10, 10] },
+            { x: 0.3, y: 0.6, r: 280, vx: -0.0003, vy: -0.0001, color: [20, 20, 20] },
         ]
 
         function resize() {

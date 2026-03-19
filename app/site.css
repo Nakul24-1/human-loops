@@ -17,7 +17,7 @@ html {
 }
 
 body {
-  background: #070707;
+  background: #000000;
   color: #f0f0f0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
@@ -33,8 +33,8 @@ body {
   --card: rgba(255, 255, 255, .03);
   --cb: rgba(255, 255, 255, .08);
   --cbh: rgba(255, 255, 255, .16);
-  --bg1: #070707;
-  --bg2: #0a0a12;
+  --bg1: #000000;
+  --bg2: #050505;
   --radius: 20px;
   --radius-sm: 12px;
   --glow-purple: rgba(120, 80, 200, .08);
@@ -142,11 +142,12 @@ h6 {
 /* ---------- HERO ---------- */
 .hero {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: 130px 52px 60px;
   gap: 40px;
-  align-items: center;
+  align-items: flex-start;
   position: relative;
   z-index: 1;
 }
@@ -161,7 +162,7 @@ h6 {
 }
 
 .hero h1 {
-  font-size: clamp(38px, 5vw, 66px);
+  font-size: clamp(48px, 6vw, 84px);
   font-weight: 900;
   letter-spacing: -3px;
   line-height: 1.0;

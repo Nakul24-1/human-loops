@@ -10,7 +10,7 @@ export default function TrustTicker() {
     return (
         <div className="trust">
             <div className="trust-wrap">
-                <div className="trust-label">Trusted by</div>
+                <div className="trust-label">Trusted by - Leading data companies</div>
                 <div className="trust-outer">
                     <div className="trust-inner">
                         {doubled.map((t, i) => (
