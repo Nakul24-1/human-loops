@@ -147,7 +147,8 @@ h6 {
   justify-content: center;
   padding: 130px 52px 60px;
   gap: 40px;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
   position: relative;
   z-index: 1;
 }
@@ -178,8 +179,10 @@ h6 {
   font-size: 15px;
   color: var(--lg);
   line-height: 1.7;
-  max-width: 440px;
+  max-width: 520px;
   margin-bottom: 36px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-sub strong {
@@ -191,6 +194,7 @@ h6 {
   display: flex;
   gap: 14px;
   align-items: center;
+  justify-content: center;
 }
 
 .btn-primary {
