@@ -7,8 +7,8 @@ const CASES = [
         tag: 'Finance · US AI Tax Platform', title: 'High-Volume Tax Document QA',
         steps: [
             { num: '01', label: 'Challenge', text: 'AI and engineering teams extracted data from thousands of tax returns and tax organisers — inconsistent accuracy across software formats, density of categories and document types causing several errors and low-quality data.' },
-            { num: '02', label: 'Deployment', text: '20-person dedicated team built from scratch. Every field reviewed, formats normalised, errors flagged and structured datasets delivered back to engineering.' },
-            { num: '03', label: 'Outcome', text: 'Error rate dropped to near-zero. Engineering team fully freed from manual review. Full ops running inside 120 days.' },
+            { num: '02', label: 'Deployment', text: '20 in-person dedicated team working 24/7. Every field reviewed, formats normalised, errors flagged and structured datasets delivered back to engineering.' },
+            { num: '03', label: 'Outcome', text: 'Full operations and onboarding handled by our team. Engineering team fully freed from manual review. Error rate dropped to near-zero.' },
         ],
         stats: [{ num: '75,000+', label: 'Documents processed' }, { num: '<120 days', label: 'Deployment to delivery' }, { num: '20', label: 'Team size' }],
     },

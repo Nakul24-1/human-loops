@@ -8,7 +8,6 @@ import TrustTicker from '@/components/TrustTicker'
 import Positioning from '@/components/Positioning'
 import Industries from '@/components/Industries'
 import Work from '@/components/Work'
-import Vision from '@/components/Vision'
 import Team from '@/components/Team'
 import Careers from '@/components/Careers'
 import CTA from '@/components/CTA'
@@ -31,7 +30,6 @@ export default function Home() {
       <Positioning />
       <Industries />
       <Work />
-      <Vision />
       <Team />
       <Careers />
       <CTA />

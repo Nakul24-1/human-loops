@@ -22,7 +22,7 @@ const INDUSTRIES = [
         id: 'rob', label: '🤖 Robotics', name: 'Robotics & Autonomous Systems',
         sector: 'Labelling · Edge Cases · Ground Truth · Simulation QA',
         desc: "Autonomous systems are only as good as their training data. We annotate the edge cases your pipeline can't auto-label — at the precision and consistency model training demands.",
-        services: ['LiDAR, camera & sensor labelling', 'Bounding box & polygon annotation', 'Robot Failure & Edge Case Review', 'Simulation & Synthetic Data QA', 'Scene classification & tagging', 'Human-robot interaction feedback', 'Teleoperation Data Review & Labelling'],
+        services: ['Teleoperations', 'Egocentric data collection', 'Robot Failure & Edge Case Review', 'Simulation & Synthetic Data QA', 'Scene classification & tagging'],
     },
 ]
 

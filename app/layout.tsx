@@ -51,7 +51,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
-        <GoogleAnalytics gaId="G-YOUR_MEASUREMENT_ID" />
+        <GoogleAnalytics gaId="G-TWWRRTG489" />
         <Analytics />
       </body>
     </html>
