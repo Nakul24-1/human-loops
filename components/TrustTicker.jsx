@@ -1,16 +1,17 @@
 export default function TrustTicker() {
     const tags = [
-        'Fortune 500 Healthcare Companies',
-        'YC-Backed AI Startups',
-        'Leading Harvesting Robotics Company',
-        'Leading AI Taxation Company',
+        'World Model Labs',
+        "Top 10 Global Data Company's India Vendor",
+        'YC backed robotics startup',
+        'Leading AI finance tool',
+        "India's top robotics company",
     ]
     const doubled = [...tags, ...tags]
 
     return (
         <div className="trust">
             <div className="trust-wrap">
-                <div className="trust-label">Trusted by - Leading data companies</div>
+                <div className="trust-label">Trusted by</div>
                 <div className="trust-outer">
                     <div className="trust-inner">
                         {doubled.map((t, i) => (

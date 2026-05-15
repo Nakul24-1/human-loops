@@ -1,35 +1,101 @@
 @import "tailwindcss";
 @import "./site.css";
 
+/* =========================================
+   THEME TOKENS — light first, dark via [data-theme="dark"]
+   --ink / --paper are RGB triplets so any rgba(255,255,255,X)
+   in site.css can become rgb(var(--ink) / X) and invert with theme.
+   ========================================= */
+
 :root {
-  --background: #000000;
-  --foreground: #edf3ff;
-  --muted: #afbdd8;
-  --muted-foreground: #afbdd8;
-  --card: rgba(8, 14, 27, 0.62);
-  --card-foreground: #edf3ff;
-  --border: rgba(132, 162, 214, 0.24);
-  --primary: #67e7cc;
-  --primary-foreground: #041125;
-  --accent: #81aefc;
-  --accent-foreground: #041125;
-  --radius: 0.75rem;
+  /* RGB triplets (no commas — used with rgb(var(--ink) / X) syntax) */
+  --ink: 27 25 22;          /* foreground ink: deep ink #1B1916 */
+  --paper: 250 250 250;     /* background paper: #FAFAFA */
+  --surface: 247 249 250;   /* off-white surface #F7F9FA */
+
+  /* Semantic colors */
+  --background: rgb(var(--paper));
+  --foreground: rgb(var(--ink));
+  --muted-foreground: rgb(var(--ink) / 0.58);
+  --muted: rgb(var(--ink) / 0.04);
+
+  /* Inverse — for buttons/chips that stay flipped relative to bg */
+  --inverse-bg: rgb(var(--ink));
+  --inverse-fg: rgb(var(--paper));
+
+  /* Brand */
+  --primary: #FF6A1A;       /* orange accent */
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #E25A0F;
+
+  /* Surfaces (glass on gradient) */
+  --card-bg: rgb(var(--paper) / 0.72);
+  --card-border: rgb(var(--ink) / 0.08);
+  --card-border-hover: rgb(var(--ink) / 0.16);
+
+  /* Lines */
+  --line-soft: rgb(var(--ink) / 0.06);
+  --line: rgb(var(--ink) / 0.10);
+  --line-strong: rgb(var(--ink) / 0.16);
+
+  /* Legacy aliases (consumed by site.css) — DO NOT REMOVE without updating site.css */
+  --w: var(--foreground);
+  --g: var(--muted-foreground);
+  --lg: rgb(var(--ink) / 0.78);
+  --card: var(--card-bg);
+  --cb: var(--card-border);
+  --cbh: var(--card-border-hover);
+  --bg1: var(--background);
+  --bg2: rgb(var(--surface));
+
+  --radius: 14px;
+  --radius-sm: 10px;
+}
+
+[data-theme="dark"] {
+  --ink: 237 237 237;       /* light ink #EDEDED */
+  --paper: 10 10 11;        /* near-black #0A0A0B */
+  --surface: 17 17 20;      /* #111114 */
+
+  --muted-foreground: rgb(var(--ink) / 0.60);
+
+  --primary: #FF7A30;
+  --primary-foreground: #0A0A0B;
+  --primary-hover: #FF923D;
+
+  --card-bg: rgb(var(--ink) / 0.03);
+  --card-border: rgb(var(--ink) / 0.08);
+  --card-border-hover: rgb(var(--ink) / 0.16);
+
+  --line-soft: rgb(var(--ink) / 0.06);
+  --line: rgb(var(--ink) / 0.10);
+  --line-strong: rgb(var(--ink) / 0.18);
+
+  --lg: rgb(var(--ink) / 0.76);
 }
 
 @theme inline {
-  --font-sans: 'Inter', 'Inter Fallback', system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-dm-sans), 'DM Sans Fallback', system-ui, -apple-system, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-border: var(--border);
+  --color-card: var(--card-bg);
+  --color-border: var(--line);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
   --radius: var(--radius);
+}
+
+/* Avoid theme flash before hydration */
+html {
+  background: var(--background);
+  color: var(--foreground);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 @keyframes trackMove {
@@ -42,7 +108,7 @@
   animation: trackMove 14s linear infinite;
 }
 
-/* Custom Scrollbar */
+/* Scrollbar */
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -53,15 +119,15 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #1e293b;
+  background-color: rgb(var(--ink) / 0.20);
   border-radius: 4px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background-color: #334155;
+  background-color: rgb(var(--ink) / 0.32);
 }
 
 html {
   scrollbar-width: thin;
-  scrollbar-color: #1e293b transparent;
+  scrollbar-color: rgb(var(--ink) / 0.20) transparent;
 }

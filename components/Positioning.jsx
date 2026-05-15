@@ -2,21 +2,39 @@
 
 import AnimatedSection from './AnimatedSection'
 
-export default function Positioning() {
-    const cards = [
-        { title: 'Built for complexity', text: <>Finance documents, clinical workflows, robotics annotations — wherever <b>data is complex</b> and the <b>stakes are high,</b> our ops teams go deep.</> },
-        { title: '100% On-site Teams', text: <>We hire 100% full-time, on-site annotators and labelers, ensuring <b>100% oversight</b>, data security, and maximum productivity.</> },
-        { title: 'Pre-model data processing or RLHF', text: <>From sorting raw data to complex RLHF, our specialized on-site teams grow into subject matter experts, managing your entire pipeline end-to-end because we hire <b>full-time & on-site.</b></> },
-    ]
+const CARDS = [
+    {
+        num: '01',
+        title: 'Specialists, not generalists',
+        text: <>Egocentric capture, teleoperation, and multimodal annotation are not side offerings. They are what we go deep on. Our operators train on <b>client hardware</b> before any production episodes. Our pipelines output to <b>RLDS, HDF5, LeRobot V2, MCAP</b>, or whatever your stack needs.</>,
+    },
+    {
+        num: '02',
+        title: 'Nothing subcontracted, nothing outsourced',
+        text: <>Every annotator, operator, and reviewer is on our payroll, working from our facility. <b>No gig workers. No crowdsourcing. No vendor chains.</b> Your data lives inside one controlled environment for the life of the project.</>,
+    },
+    {
+        num: '03',
+        title: 'Spun up in weeks, not quarters',
+        text: <>Recruiting, training, equipment provisioning, ops, and QA all sit inside the same building. When scope expands or a new program lands, we <b>scale the team, not the vendor list</b>. Pilot to production on a robotics timeline.</>,
+    },
+    {
+        num: '04',
+        title: 'Capture to delivery, one team',
+        text: <>Collection, teleoperation, annotation, labelling, format conversion, and final QA happen under one roof, one project manager, <b>one quality bar</b>. Raw capture goes in, training-ready data comes out.</>,
+    },
+]
 
+export default function Positioning() {
     return (
-        <section id="pos">
-            <AnimatedSection><div className="section-tag">What we do Different</div></AnimatedSection>
-            <AnimatedSection delay={0.1}><h2>Where AI Workflows Meet<br />Human Validation.</h2></AnimatedSection>
+        <section id="how">
+            <AnimatedSection><div className="section-tag">Why teams pick us</div></AnimatedSection>
+            <AnimatedSection delay={0.1}><h2>How we are different.</h2></AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <div className="pos-grid">
-                    {cards.map((c, i) => (
+                    {CARDS.map((c, i) => (
                         <div className="card" key={i}>
+                            <div className="pos-num">{c.num}</div>
                             <div className="pos-title">{c.title}</div>
                             <div className="pos-text">{c.text}</div>
                         </div>

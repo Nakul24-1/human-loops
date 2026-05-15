@@ -1,47 +1,99 @@
 "use client"
 
 import AnimatedSection from './AnimatedSection'
+import { CALENDLY_URL } from '@/lib/constants'
 
 const CASES = [
     {
-        tag: 'Finance · US AI Tax Platform', title: 'High-Volume Tax Document QA',
+        num: '01',
+        tag: 'Physical AI · Egocentric Data Program',
+        title: '50,000 hours across 120 commercial environments and 300+ households.',
+        hook: 'Two months. Strict per-contributor quotas. iPhone-only capture via the client app.',
         steps: [
-            { num: '01', label: 'Challenge', text: 'AI and engineering teams extracted data from thousands of tax returns and tax organisers — inconsistent accuracy across software formats, density of categories and document types causing several errors and low-quality data.' },
-            { num: '02', label: 'Deployment', text: '20 in-person dedicated team working 24/7. Every field reviewed, formats normalised, errors flagged and structured datasets delivered back to engineering.' },
-            { num: '03', label: 'Outcome', text: 'Full operations and onboarding handled by our team. Engineering team fully freed from manual review. Error rate dropped to near-zero.' },
+            { num: '01', label: 'Challenge', text: 'High-diversity first-person video for model pretraining. Strict per-contributor quotas, iPhone-only capture via the client mobile app, two-month window.' },
+            { num: '02', label: 'Deployment', text: 'Sourced 120 commercial environments across retail, industrial, agriculture, and automotive. Onboarded 300+ households. 125 hours per commercial contributor, 50 per household, set to hit diversity targets. 40 field supervisors managed contributors in person to maintain 95% data quality accuracy.' },
+            { num: '03', label: 'Outcome', text: '50,000 hours delivered inside the window. Diversity targets met across environment, demographic, and task.' },
         ],
-        stats: [{ num: '75,000+', label: 'Documents processed' }, { num: '<120 days', label: 'Deployment to delivery' }, { num: '20', label: 'Team size' }],
+        stats: [
+            { num: '50,000', label: 'Hours delivered' },
+            { num: '120', label: 'Commercial environments' },
+            { num: '300+', label: 'Households' },
+        ],
+        actions: [
+            { label: 'See sample egocentric videos →', primary: true, href: CALENDLY_URL },
+            { label: 'Request the full sample set', primary: false, href: CALENDLY_URL },
+        ],
     },
     {
-        tag: 'Healthcare · AI SaaS Platform', title: 'Clinical AI Output Verification',
+        num: '02',
+        tag: 'Physical AI · Real-to-Sim Capture Program',
+        title: '5,000 hours of specialized warehouse capture for a real-to-sim pipeline.',
+        hook: 'Dense multimodal capture inside live warehouse environments for world-model training and policy evaluation.',
         steps: [
-            { num: '01', label: 'Challenge', text: 'AI agents generating prior auth submissions and Rx parsing across thousands of patient records — drug names, dosage errors, several format errors that reached clinicians unverified.' },
-            { num: '02', label: 'Deployment', text: '15-person team of trained professionals, nurses and licensed medical professionals — hired, trained and deployed on-ground to verify AI output against source documents in real time.' },
-            { num: '03', label: 'Outcome', text: '23,000+ AI outputs verified. Corrections fed back as training data. Model accuracy improved. 24/7 ops coverage maintained continuously.' },
+            { num: '01', label: 'Challenge', text: 'A robotics customer building autonomous warehouse systems needed dense, multimodal capture inside live warehouse environments: synchronized RGB-D, depth, motion, and operator action data for downstream simulation, world-model training, and policy evaluation.' },
+            { num: '02', label: 'Deployment', text: 'Deployed a specialized field team trained on client-provided capture hardware. Multi-rig synchronized recording (RGB-D, depth, IMU, action telemetry) operated across one warehouse site. On-site quality reviewers validated every session for synchronization, completeness, and protocol compliance. Custom format conversion and metadata schemas matched the client simulation stack directly.' },
+            { num: '03', label: 'Outcome', text: '5,000 hours of production-ready capture, fully synchronized, structured to the client sim format, delivered as a continuously growing dataset feeding their world-model training and real-to-sim evaluation loops in 45 days.' },
         ],
-        stats: [{ num: '23,000+', label: 'AI outputs corrected' }, { num: '24/7', label: 'Ops coverage' }, { num: '15', label: 'Medical professionals' }],
+        stats: [
+            { num: '5,000', label: 'Hours captured' },
+            { num: '45 days', label: 'To first delivery' },
+            { num: '1', label: 'Live warehouse site' },
+        ],
+    },
+    {
+        num: '03',
+        tag: 'Finance · AI Tax Platform',
+        title: 'High-volume tax document QA across 75,000+ documents.',
+        hook: 'A 20-person dedicated on-site team running 24/7 across Lacerte, ProSeries, UltraTax, and Drake.',
+        steps: [
+            { num: '01', label: 'Challenge', text: "An AI tax platform's extraction pipeline produced inconsistent accuracy across software formats, document categories, and form densities. Errors were reaching engineering review faster than they could be corrected." },
+            { num: '02', label: 'Deployment', text: '20-person dedicated on-site team operating 24/7. Every field reviewed, formats normalized across Lacerte, ProSeries, UltraTax, Drake, errors flagged, and structured datasets delivered back to the engineering team.' },
+            { num: '03', label: 'Outcome', text: 'Full operations and onboarding handled by Human Loops. Engineering team fully freed from manual review. Error rate dropped to near zero across the deployment window.' },
+        ],
+        stats: [
+            { num: '75,000+', label: 'Documents processed' },
+            { num: '24/7', label: 'Ops coverage' },
+            { num: '20', label: 'Team size' },
+        ],
+    },
+    {
+        num: '04',
+        tag: 'Finance · Synthetic Tax Document Dataset',
+        title: '400 masked 1040s plus full supporting document sets. Nine weeks.',
+        hook: 'Production-grade synthetic US tax returns for model training — every supporting document a real filing would include.',
+        steps: [
+            { num: '01', label: 'Challenge', text: 'An AI tax platform needed a production-grade synthetic dataset of US tax returns for model training. Real returns, fully de-identified, with every supporting document a real filing would include.' },
+            { num: '02', label: 'Deployment', text: 'Started from 400 real 1040s. PII removed across every form and supporting document to produce 400 masked 1040s. For each return, the team generated the full supporting set: W-2s, 1099 INT, 1099 DIV, and all other source documents, plus tax summaries and tax questionnaires. Mixed team of associates and CPAs, with CPA review on every return for format correctness and tax-logic consistency.' },
+            { num: '03', label: 'Outcome', text: "Complete synthetic dataset delivered in nine weeks. Format-correct, statistically faithful, CPA-verified, ready as direct input to the client's training pipeline." },
+        ],
+        stats: [
+            { num: '400', label: 'Masked 1040s + supporting docs' },
+            { num: '9 weeks', label: 'End to end' },
+            { num: '100%', label: 'CPA-reviewed' },
+        ],
     },
 ]
 
 const TESTIMONIALS = [
-    { quote: '"The team plugged into our pipeline in days. The quality bar they hold is genuinely impressive."', who: 'Head of Product', co: 'YC-backed AI startup' },
-    { quote: '"We were struggling with scaling our QA/QC on data. The Human Loops team took that entirely off our plate."', who: 'CEO', co: 'AI HealthTech Platform' },
+    { quote: '"The team plugged into our pipeline in days. The quality bar they hold is genuinely impressive."', who: 'Head of Product', co: 'YC-backed robotics startup' },
     { quote: '"Turnaround was super fast and error rates are the lowest at the price point we\'ve seen from any vendor, period."', who: 'CEO', co: 'AI Tax SaaS' },
+    { quote: '"They scaled the team faster than any vendor we have worked with. The dataset shipped on the timeline they promised."', who: 'Head of Data', co: 'World Model Lab' },
 ]
 
 export default function Work() {
     const allTestimonials = [...TESTIMONIALS, ...TESTIMONIALS]
     return (
         <section id="work" className="section-fade">
-            <AnimatedSection><div className="section-tag">Client Work</div></AnimatedSection>
-            <AnimatedSection delay={0.1}><h2>Results That Speak.</h2></AnimatedSection>
-            <AnimatedSection delay={0.15}><p className="section-sub">A selection of how we&apos;ve operated. Clients are confidential — the outcomes are real.</p></AnimatedSection>
+            <AnimatedSection><div className="section-tag">Selected work</div></AnimatedSection>
+            <AnimatedSection delay={0.1}><h2>Results that ship to production.</h2></AnimatedSection>
+            <AnimatedSection delay={0.15}><p className="section-sub">A selection of how we operate. Clients stay confidential. The outcomes are real.</p></AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <div className="work-grid">
-                    {CASES.map((c, ci) => (
-                        <div className="card" key={ci}>
-                            <div className="work-tag">{c.tag}</div>
+                    {CASES.map((c) => (
+                        <div className="card" key={c.num}>
+                            <div className="work-tag">Case {c.num} · {c.tag}</div>
                             <div className="work-title">{c.title}</div>
+                            <div className="work-hook">{c.hook}</div>
                             <div className="work-steps">
                                 {c.steps.map((s, si) => (
                                     <div className="work-step" key={si}>
@@ -51,8 +103,20 @@ export default function Work() {
                                 ))}
                             </div>
                             <div className="work-stats">
-                                {c.stats.map((s, si) => (<div key={si}><div className="work-stat-num">{s.num}</div><div className="work-stat-label">{s.label}</div></div>))}
+                                {c.stats.map((s, si) => (
+                                    <div key={si}>
+                                        <div className="work-stat-num">{s.num}</div>
+                                        <div className="work-stat-label">{s.label}</div>
+                                    </div>
+                                ))}
                             </div>
+                            {c.actions && (
+                                <div className="work-actions">
+                                    {c.actions.map((a, ai) => (
+                                        <a key={ai} href={a.href} target="_blank" rel="noopener noreferrer" className={a.primary ? 'btn-primary' : 'btn-secondary'}>{a.label}</a>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
