@@ -1,21 +1,23 @@
 "use client"
 
 import AnimatedSection from './AnimatedSection'
+import { LINKEDIN_URL, CONTACT_EMAIL } from '@/lib/constants'
 
 const JOBS = [
+    { title: 'Field Operations Manager', tags: ['Physical AI Ops', 'Nagpur', 'Full-time'] },
     { title: 'Operations Manager', tags: ['Ops Leadership', 'Nagpur', 'Full-time'] },
     { title: 'Operations Associate', tags: ['HITL Ops', 'Nagpur', 'Full-time'] },
-    { title: 'Nurse — Clinical QA', tags: ['Healthcare Ops', 'Nagpur', 'Full-time'] },
-    { title: 'Data Labelling Specialist', tags: ['Robotics Ops', 'Nagpur', 'Full-time'] },
-    { title: 'Business Development', tags: ['Growth', 'Remote', 'Full-time'] },
+    { title: 'Annotator', tags: ['Data Ops', 'Nagpur', 'Full-time'] },
+    { title: 'Recruiter', tags: ['People Ops', 'Nagpur', 'Full-time'] },
+    { title: 'Operations Intern', tags: ['Multiple teams', 'Nagpur', 'Full-time'] },
 ]
 
 export default function Careers() {
     return (
-        <section id="jobs">
+        <section id="careers">
             <AnimatedSection><div className="section-tag">Careers</div></AnimatedSection>
-            <AnimatedSection delay={0.1}><h2>Join the Loop.</h2></AnimatedSection>
-            <AnimatedSection delay={0.15}><p className="section-sub">Detail-obsessed operators who want to work at the frontier of AI and human collaboration.</p></AnimatedSection>
+            <AnimatedSection delay={0.1}><h2>Join our team.</h2></AnimatedSection>
+            <AnimatedSection delay={0.15}><p className="section-sub">Detail-obsessed operators who want to work at the frontier of AI and the physical world. All roles are full time, on site, in Nagpur.</p></AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <div className="jobs-grid">
                     {JOBS.map((j, i) => (
@@ -24,13 +26,13 @@ export default function Careers() {
                             <div className="job-meta">
                                 {j.tags.map((t, ti) => (<span className="job-meta-tag" key={ti}>{t}</span>))}
                             </div>
-                            <a href="https://www.linkedin.com/company/human-loops/" target="_blank" rel="noopener noreferrer" className="job-apply">Apply on LinkedIn →</a>
+                            <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className="job-apply">Apply on LinkedIn →</a>
                         </div>
                     ))}
-                    <div className="job-card" style={{ borderStyle: 'dashed', opacity: 0.5 }}>
-                        <div className="job-title" style={{ color: 'var(--g)' }}>More roles opening soon</div>
-                        <div className="job-meta"><span className="job-meta-tag">Multiple teams</span><span className="job-meta-tag">Nagpur</span></div>
-                        <a href="mailto:hello@thehumanloops.com" className="job-apply">Send your profile →</a>
+                    <div className="job-card" style={{ borderStyle: 'dashed' }}>
+                        <div className="job-title">Don&apos;t see your role?</div>
+                        <div className="job-meta"><span className="job-meta-tag">Anywhere</span><span className="job-meta-tag">Send your profile</span></div>
+                        <a href={`mailto:${CONTACT_EMAIL}`} className="job-apply">{CONTACT_EMAIL} →</a>
                     </div>
                 </div>
             </AnimatedSection>

@@ -12,24 +12,24 @@ interface Packet {
   id: number;
   status: PacketStatus;
   label: string;
-  sector: "legal" | "healthcare" | "finance";
+  sector: "robotics" | "legal" | "finance";
 }
 
 const TASK_POOL: { label: string; sector: Packet["sector"] }[] = [
+  { label: "Egocentric episode review", sector: "robotics" },
   { label: "Contract clause review", sector: "legal" },
-  { label: "Patient intake form", sector: "healthcare" },
   { label: "Invoice reconciliation", sector: "finance" },
+  { label: "Teleop trajectory QA", sector: "robotics" },
   { label: "NDA classification", sector: "legal" },
-  { label: "Lab result summary", sector: "healthcare" },
   { label: "Expense categorisation", sector: "finance" },
+  { label: "Hand-object contact label", sector: "robotics" },
   { label: "Compliance check", sector: "legal" },
-  { label: "Insurance claim entry", sector: "healthcare" },
   { label: "Tax filing review", sector: "finance" },
+  { label: "Scene segmentation pass", sector: "robotics" },
   { label: "Deposition tagging", sector: "legal" },
-  { label: "Prescription validation", sector: "healthcare" },
   { label: "Payroll data entry", sector: "finance" },
+  { label: "Action recognition labels", sector: "robotics" },
   { label: "Case brief extraction", sector: "legal" },
-  { label: "Discharge note review", sector: "healthcare" },
   { label: "Audit trail check", sector: "finance" },
 ];
 
@@ -89,8 +89,8 @@ function FlagIcon({ color }: { color: string }) {
    Sector badge colors
    ────────────────────────────────────── */
 const SECTOR_COLORS: Record<Packet["sector"], string> = {
+  robotics: "rgba(100,200,255,0.6)",
   legal: "rgba(168,148,255,0.6)",
-  healthcare: "rgba(100,200,255,0.6)",
   finance: "rgba(255,200,100,0.6)",
 };
 
