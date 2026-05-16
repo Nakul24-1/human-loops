@@ -26,28 +26,6 @@ body {
   position: relative;
 }
 
-/* Site-wide grid background (BGA-inspired) */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, rgb(var(--ink) / 0.16) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(var(--ink) / 0.16) 1px, transparent 1px);
-  background-size: 64px 64px;
-  background-position: 0 0;
-  mask-image: radial-gradient(ellipse 100% 90% at center, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 100% 90% at center, black 40%, transparent 100%);
-}
-
-[data-theme="dark"] body::before {
-  background-image:
-    linear-gradient(to right, rgb(var(--ink) / 0.14) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(var(--ink) / 0.14) 1px, transparent 1px);
-}
-
 h1,
 h2,
 h3,
@@ -634,6 +612,27 @@ section h2 {
 .svc-row.active {
   border-color: var(--primary);
   background: rgb(var(--ink) / 0.04);
+}
+
+.svc-row.active.autoplay::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--primary);
+  transform-origin: left center;
+  animation: svcProgress var(--svc-autoplay-ms, 4500ms) linear forwards;
+}
+
+.svc-row {
+  position: relative;
+}
+
+@keyframes svcProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 .svc-row-left {
@@ -1238,10 +1237,6 @@ section h2 {
   .footer-nav { gap: 14px; flex-wrap: wrap; }
 
   .back-to-top { padding: 20px; }
-
-  body::before {
-    background-size: 40px 40px;
-  }
 }
 
 @media (max-width: 420px) {

@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedSection from './AnimatedSection'
+
+const AUTOPLAY_MS = 4500
 
 const PRACTICES = [
     {
@@ -129,16 +131,51 @@ function PlusIcon() {
 export default function Services() {
     const [practiceIdx, setPracticeIdx] = useState(0)
     const [activeIdx, setActiveIdx] = useState(0)
+    const [autoplay, setAutoplay] = useState(true)
+    const [inView, setInView] = useState(false)
+    const sectionRef = useRef(null)
     const practice = PRACTICES[practiceIdx]
     const active = practice.services[activeIdx]
 
     const switchPractice = (i) => {
         setPracticeIdx(i)
         setActiveIdx(0)
+        setAutoplay(false)
     }
 
+    const selectService = (i) => {
+        setActiveIdx(i)
+        setAutoplay(false)
+    }
+
+    // Pause autoplay when section is offscreen — saves cycles + avoids surprising the user
+    useEffect(() => {
+        const el = sectionRef.current
+        if (!el || typeof IntersectionObserver === 'undefined') return
+        const io = new IntersectionObserver(
+            ([entry]) => setInView(entry.isIntersecting),
+            { threshold: 0.25 },
+        )
+        io.observe(el)
+        return () => io.disconnect()
+    }, [])
+
+    // Autoplay tick — cycles services every AUTOPLAY_MS while in view + uninterrupted
+    useEffect(() => {
+        if (!autoplay || !inView) return
+        const t = setInterval(() => {
+            setActiveIdx((i) => (i + 1) % practice.services.length)
+        }, AUTOPLAY_MS)
+        return () => clearInterval(t)
+    }, [autoplay, inView, practice.services.length])
+
     return (
-        <section id="services" className="section-fade">
+        <section
+            id="services"
+            className="section-fade"
+            ref={sectionRef}
+            onMouseEnter={() => setAutoplay(false)}
+        >
             <AnimatedSection><div className="section-tag">Services</div></AnimatedSection>
             <AnimatedSection delay={0.1}><h2>Two practices. Both run end to end, in our facility, by our team.</h2></AnimatedSection>
 
@@ -183,8 +220,9 @@ export default function Services() {
                             <button
                                 type="button"
                                 key={s.num}
-                                className={`svc-row${activeIdx === i ? ' active' : ''}`}
-                                onClick={() => setActiveIdx(i)}
+                                className={`svc-row${activeIdx === i ? ' active' : ''}${activeIdx === i && autoplay && inView ? ' autoplay' : ''}`}
+                                style={{ '--svc-autoplay-ms': `${AUTOPLAY_MS}ms` }}
+                                onClick={() => selectService(i)}
                             >
                                 <span className="svc-row-left">
                                     <span className="svc-row-num">{s.num}</span>
