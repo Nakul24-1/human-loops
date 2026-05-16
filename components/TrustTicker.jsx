@@ -1,7 +1,7 @@
 export default function TrustTicker() {
     const tags = [
         'World Model Labs',
-        "Top 10 Global Data Company's India Vendor",
+        'Top 10 Global Data companies',
         'YC backed robotics startup',
         'Leading AI finance tool',
         "India's top robotics company",
