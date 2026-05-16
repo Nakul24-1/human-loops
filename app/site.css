@@ -614,6 +614,27 @@ section h2 {
   background: rgb(var(--ink) / 0.04);
 }
 
+.svc-row.active.autoplay::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--primary);
+  transform-origin: left center;
+  animation: svcProgress var(--svc-autoplay-ms, 4500ms) linear forwards;
+}
+
+.svc-row {
+  position: relative;
+}
+
+@keyframes svcProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 .svc-row-left {
   display: flex;
   align-items: center;

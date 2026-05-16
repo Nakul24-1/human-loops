@@ -1,12 +1,13 @@
 "use client"
 
 import { motion } from 'framer-motion'
+import CountUp from './CountUp'
 import { CALENDLY_URL } from '@/lib/constants'
 
 const STATS = [
-    { num: '105,000+', label: 'Hours of physical world data collected' },
-    { num: '65+', label: 'People, all in house, all on payroll' },
-    { num: '0', label: 'Work subcontracted or outsourced' },
+    { value: 105000, suffix: '+', label: 'Hours of physical world data collected' },
+    { value: 65, suffix: '+', label: 'People, all in house, all on payroll' },
+    { value: 0, suffix: '', label: 'Work subcontracted or outsourced' },
 ]
 
 export default function Hero() {
@@ -27,7 +28,9 @@ export default function Hero() {
             <motion.div className="hero-stats" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.55 }}>
                 {STATS.map((s, i) => (
                     <div key={i}>
-                        <div className="hero-stat-num">{s.num}</div>
+                        <div className="hero-stat-num">
+                            <CountUp value={s.value} suffix={s.suffix} duration={1600} />
+                        </div>
                         <div className="hero-stat-label">{s.label}</div>
                     </div>
                 ))}
