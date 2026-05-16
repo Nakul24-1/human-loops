@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedSection from './AnimatedSection'
 
 const AUTOPLAY_MS = 4500
+const HOVER_RESUME_MS = 1500
 
 const PRACTICES = [
     {
@@ -131,22 +132,48 @@ function PlusIcon() {
 export default function Services() {
     const [practiceIdx, setPracticeIdx] = useState(0)
     const [activeIdx, setActiveIdx] = useState(0)
-    const [autoplay, setAutoplay] = useState(true)
+    // Permanent stop (set by row click or tab switch) — never resumes until reload
+    const [permanentlyPaused, setPermanentlyPaused] = useState(false)
+    // Temporary hover pause — auto-resumes 1.5s after mouse leaves
+    const [hoverPaused, setHoverPaused] = useState(false)
     const [inView, setInView] = useState(false)
     const sectionRef = useRef(null)
+    const resumeTimerRef = useRef(null)
     const practice = PRACTICES[practiceIdx]
     const active = practice.services[activeIdx]
+    const autoplayActive = !permanentlyPaused && !hoverPaused && inView
 
     const switchPractice = (i) => {
         setPracticeIdx(i)
         setActiveIdx(0)
-        setAutoplay(false)
+        setPermanentlyPaused(true)
     }
 
     const selectService = (i) => {
         setActiveIdx(i)
-        setAutoplay(false)
+        setPermanentlyPaused(true)
     }
+
+    const handleMouseEnter = () => {
+        if (resumeTimerRef.current) {
+            clearTimeout(resumeTimerRef.current)
+            resumeTimerRef.current = null
+        }
+        setHoverPaused(true)
+    }
+
+    const handleMouseLeave = () => {
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
+        resumeTimerRef.current = setTimeout(() => {
+            setHoverPaused(false)
+            resumeTimerRef.current = null
+        }, HOVER_RESUME_MS)
+    }
+
+    // Cleanup the resume timer on unmount
+    useEffect(() => () => {
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
+    }, [])
 
     // Pause autoplay when section is offscreen — saves cycles + avoids surprising the user
     useEffect(() => {
@@ -160,21 +187,22 @@ export default function Services() {
         return () => io.disconnect()
     }, [])
 
-    // Autoplay tick — cycles services every AUTOPLAY_MS while in view + uninterrupted
+    // Autoplay tick — cycles services every AUTOPLAY_MS while autoplay is active
     useEffect(() => {
-        if (!autoplay || !inView) return
+        if (!autoplayActive) return
         const t = setInterval(() => {
             setActiveIdx((i) => (i + 1) % practice.services.length)
         }, AUTOPLAY_MS)
         return () => clearInterval(t)
-    }, [autoplay, inView, practice.services.length])
+    }, [autoplayActive, practice.services.length])
 
     return (
         <section
             id="services"
             className="section-fade"
             ref={sectionRef}
-            onMouseEnter={() => setAutoplay(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
             <AnimatedSection><div className="section-tag">Services</div></AnimatedSection>
             <AnimatedSection delay={0.1}><h2>Two practices. Both run end to end, in our facility, by our team.</h2></AnimatedSection>
@@ -220,7 +248,7 @@ export default function Services() {
                             <button
                                 type="button"
                                 key={s.num}
-                                className={`svc-row${activeIdx === i ? ' active' : ''}${activeIdx === i && autoplay && inView ? ' autoplay' : ''}`}
+                                className={`svc-row${activeIdx === i ? ' active' : ''}${activeIdx === i && autoplayActive ? ' autoplay' : ''}`}
                                 style={{ '--svc-autoplay-ms': `${AUTOPLAY_MS}ms` }}
                                 onClick={() => selectService(i)}
                             >
