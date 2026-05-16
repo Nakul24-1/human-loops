@@ -1,7 +1,6 @@
 "use client"
 
 import { motion } from 'framer-motion'
-import HeroGradient from './HeroGradient'
 import { CALENDLY_URL } from '@/lib/constants'
 
 const STATS = [
@@ -13,9 +12,7 @@ const STATS = [
 export default function Hero() {
     return (
         <section id="hero" className="hero">
-            <HeroGradient />
-
-            <motion.div className="hero-tag" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
+            <motion.div className="hero-eyebrow" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
                 Your robots. Our data.
             </motion.div>
 
