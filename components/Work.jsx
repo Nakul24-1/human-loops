@@ -1,7 +1,6 @@
 "use client"
 
 import AnimatedSection from './AnimatedSection'
-import { CALENDLY_URL } from '@/lib/constants'
 
 const CASES = [
     {
@@ -20,8 +19,7 @@ const CASES = [
             { num: '300+', label: 'Households' },
         ],
         actions: [
-            { label: 'See sample egocentric videos →', primary: true, href: CALENDLY_URL },
-            { label: 'Request the full sample set', primary: false, href: CALENDLY_URL },
+            { label: 'See sample egocentric videos →', primary: true, href: 'https://drive.google.com/drive/folders/1uyFZ0tCjoYm4kY6kS92d7d5vfF3mGDeT?usp=sharing' },
         ],
     },
     {
@@ -74,14 +72,7 @@ const CASES = [
     },
 ]
 
-const TESTIMONIALS = [
-    { quote: '"The team plugged into our pipeline in days. The quality bar they hold is genuinely impressive."', who: 'Head of Product', co: 'YC-backed robotics startup' },
-    { quote: '"Turnaround was super fast and error rates are the lowest at the price point we\'ve seen from any vendor, period."', who: 'CEO', co: 'AI Tax SaaS' },
-    { quote: '"They scaled the team faster than any vendor we have worked with. The dataset shipped on the timeline they promised."', who: 'Head of Data', co: 'World Model Lab' },
-]
-
 export default function Work() {
-    const allTestimonials = [...TESTIMONIALS, ...TESTIMONIALS]
     return (
         <section id="work" className="section-fade">
             <AnimatedSection><div className="section-tag">Selected work</div></AnimatedSection>
@@ -120,16 +111,6 @@ export default function Work() {
                     ))}
                 </div>
             </AnimatedSection>
-            <div className="test-wrap">
-                <div className="test-track">
-                    {allTestimonials.map((t, i) => (
-                        <div className="test-card" key={i}>
-                            <div className="test-quote">{t.quote}</div>
-                            <div className="test-who"><strong>{t.who}</strong><span>{t.co}</span></div>
-                        </div>
-                    ))}
-                </div>
-            </div>
         </section>
     )
 }

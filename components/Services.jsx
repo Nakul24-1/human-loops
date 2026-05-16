@@ -23,19 +23,19 @@ const PRACTICES = [
             {
                 num: '02',
                 title: 'Teleoperation Data Collection',
-                tagline: 'We teleoperate robots — for training, for data collection, for running production tasks, or for evaluating policies in the loop. Skilled operators trained on your platform.',
+                tagline: 'We teleoperate robots. For training, data collection, supervised autonomy, and running production tasks. Operators are based in our Nagpur facility and can connect to your robots anywhere in the world over your existing teleop stack.',
                 included: [
                     'Operators trained on the specific platform before any production episodes',
-                    'Leader-follower (including GELLO), VR (Meta Quest), and SpaceMouse interfaces',
-                    'Synchronized multimodal capture across vision, depth, proprioception, and force',
-                    'Per-episode quality review for smoothness, success, and temporal sync under 10ms drift',
-                    'Output formats: RLDS, HDF5, zarr, LeRobot V2',
+                    'Remote operation over your teleop stack',
+                    'Synchronized multimodal capture across vision, depth, proprioception, and force where available',
+                    'Output formats when data is the deliverable: RLDS, HDF5, zarr, LeRobot V2',
+                    '24/7 shift coverage available across US, EU, and APAC time zones',
                 ],
             },
             {
                 num: '03',
                 title: 'Real World Capture for Sim & World Models',
-                tagline: 'Specialized multimodal capture in target environments — warehouses, factories, retail floors, labs.',
+                tagline: 'Specialized multimodal capture in target environments: warehouses, factories, retail floors, labs.',
                 included: [
                     'Client-provided or sourced specialty hardware (depth rigs, LiDAR, MoCap)',
                     'Synchronized multimodal capture (vision, depth, IMU, action telemetry)',
@@ -60,7 +60,7 @@ const PRACTICES = [
                     'Temporal action segmentation and labelling',
                     'Object tracking and re-identification across frames',
                     'Hand-object interaction labelling for manipulation tasks',
-                    'Hindsight labelling — natural-language task descriptions for raw episodes',
+                    'Hindsight labelling: natural-language task descriptions for raw episodes',
                     'Edge-case curation: deformables, transparents, contact-rich, occluded scenes',
                 ],
             },
@@ -94,7 +94,7 @@ const PRACTICES = [
             },
             {
                 num: '03',
-                title: 'AI Output Validation — Financial Documents',
+                title: 'AI Output Validation for Financial Documents',
                 tagline: 'Verification of AI-extracted outputs against source documents.',
                 included: [
                     'Account-level reconciliation review',
