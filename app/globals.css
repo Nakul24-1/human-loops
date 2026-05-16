@@ -24,9 +24,10 @@
   --inverse-fg: rgb(var(--paper));
 
   /* Brand */
-  --primary: #FF6A1A;       /* orange accent */
-  --primary-foreground: #FFFFFF;
-  --primary-hover: #E25A0F;
+  --primary: #6BCB1F;       /* lime green accent — readable on light */
+  --primary-foreground: #0A1A02;
+  --primary-hover: #58AE15;
+  --primary-bright: #A6E40E; /* brighter lime for dark theme + accents */
 
   /* Surfaces (glass on gradient) */
   --card-bg: rgb(var(--paper) / 0.72);
@@ -59,9 +60,10 @@
 
   --muted-foreground: rgb(var(--ink) / 0.60);
 
-  --primary: #FF7A30;
-  --primary-foreground: #0A0A0B;
-  --primary-hover: #FF923D;
+  --primary: #A6E40E;       /* bright lime on dark — high contrast */
+  --primary-foreground: #0A1A02;
+  --primary-hover: #B8F12E;
+  --primary-bright: #A6E40E;
 
   --card-bg: rgb(var(--ink) / 0.03);
   --card-border: rgb(var(--ink) / 0.08);

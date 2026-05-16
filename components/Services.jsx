@@ -8,7 +8,6 @@ const PRACTICES = [
     {
         id: 'pai',
         label: 'Physical AI',
-        desc: 'Capture the physical world. Teleoperate inside it. Annotate it.',
         services: [
             {
                 num: '01',
@@ -35,7 +34,7 @@ const PRACTICES = [
             },
             {
                 num: '03',
-                title: 'Real World Capture for Sim and World Models',
+                title: 'Real World Capture for Sim & World Models',
                 tagline: 'Specialized multimodal capture in target environments — warehouses, factories, retail floors, labs.',
                 included: [
                     'Client-provided or sourced specialty hardware (depth rigs, LiDAR, MoCap)',
@@ -55,7 +54,7 @@ const PRACTICES = [
             },
             {
                 num: '05',
-                title: 'Video Annotation and Labelling',
+                title: 'Video Annotation & Labelling',
                 tagline: 'Action recognition, temporal segmentation, and object tracking across long-horizon video for foundation-model training and evaluation.',
                 included: [
                     'Temporal action segmentation and labelling',
@@ -70,7 +69,6 @@ const PRACTICES = [
     {
         id: 'fin',
         label: 'Finance',
-        desc: 'High-stakes document workflows where we already operate at scale.',
         services: [
             {
                 num: '01',
@@ -85,7 +83,7 @@ const PRACTICES = [
             },
             {
                 num: '02',
-                title: 'Tax Document Annotation and Labelling',
+                title: 'Tax Document Annotation & Labelling',
                 tagline: 'Field-level extraction and structured labelling at production volume.',
                 included: [
                     'Form-aware labelling across Lacerte, ProSeries, UltraTax, Drake',
@@ -120,15 +118,29 @@ const PRACTICES = [
     },
 ]
 
+function PlusIcon() {
+    return (
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M7 1v12M1 7h12" />
+        </svg>
+    )
+}
+
 export default function Services() {
-    const [active, setActive] = useState(0)
-    const practice = PRACTICES[active]
+    const [practiceIdx, setPracticeIdx] = useState(0)
+    const [activeIdx, setActiveIdx] = useState(0)
+    const practice = PRACTICES[practiceIdx]
+    const active = practice.services[activeIdx]
+
+    const switchPractice = (i) => {
+        setPracticeIdx(i)
+        setActiveIdx(0)
+    }
 
     return (
         <section id="services" className="section-fade">
-            <AnimatedSection><div className="section-tag">What we do</div></AnimatedSection>
-            <AnimatedSection delay={0.1}><h2>Services.</h2></AnimatedSection>
-            <AnimatedSection delay={0.15}><p className="section-sub">Two practices. Both run end to end, in our facility, by our team.</p></AnimatedSection>
+            <AnimatedSection><div className="section-tag">Services</div></AnimatedSection>
+            <AnimatedSection delay={0.1}><h2>Two practices. Both run end to end, in our facility, by our team.</h2></AnimatedSection>
 
             <AnimatedSection delay={0.2}>
                 <div className="svc-tabs">
@@ -136,8 +148,8 @@ export default function Services() {
                         <button
                             type="button"
                             key={p.id}
-                            className={`svc-tab${active === i ? ' active' : ''}`}
-                            onClick={() => setActive(i)}
+                            className={`svc-tab${practiceIdx === i ? ' active' : ''}`}
+                            onClick={() => switchPractice(i)}
                         >
                             {p.label}
                         </button>
@@ -145,32 +157,47 @@ export default function Services() {
                 </div>
             </AnimatedSection>
 
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={practice.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                >
-                    <div className="practice-name">{practice.label}</div>
-                    <p className="practice-desc">{practice.desc}</p>
+            <AnimatedSection delay={0.25}>
+                <div className="svc-accordion">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={`${practice.id}-${active.num}`}
+                            className="svc-detail"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                        >
+                            <div className="svc-detail-num">{active.num} · {practice.label}</div>
+                            <div className="svc-detail-title">{active.title}</div>
+                            <div className="svc-detail-tagline">{active.tagline}</div>
+                            <div className="svc-detail-included">What&apos;s included</div>
+                            <ul className="svc-detail-list">
+                                {active.included.map((item, i) => (<li key={i}>{item}</li>))}
+                            </ul>
+                        </motion.div>
+                    </AnimatePresence>
 
-                    <div className="svc-grid">
-                        {practice.services.map((s) => (
-                            <div className="svc-card" key={s.num}>
-                                <div className="svc-card-num">{s.num}</div>
-                                <div className="svc-card-title">{s.title}</div>
-                                <div className="svc-card-tagline">{s.tagline}</div>
-                                <div className="svc-card-included">What&apos;s included</div>
-                                <ul className="svc-card-list">
-                                    {s.included.map((item, i) => (<li key={i}>{item}</li>))}
-                                </ul>
-                            </div>
+                    <div className="svc-list">
+                        {practice.services.map((s, i) => (
+                            <button
+                                type="button"
+                                key={s.num}
+                                className={`svc-row${activeIdx === i ? ' active' : ''}`}
+                                onClick={() => setActiveIdx(i)}
+                            >
+                                <span className="svc-row-left">
+                                    <span className="svc-row-num">{s.num}</span>
+                                    <span className="svc-row-title">{s.title}</span>
+                                </span>
+                                <span className="svc-row-arrow" aria-hidden="true">
+                                    <PlusIcon />
+                                </span>
+                            </button>
                         ))}
                     </div>
-                </motion.div>
-            </AnimatePresence>
+                </div>
+            </AnimatedSection>
         </section>
     )
 }

@@ -85,8 +85,7 @@ export default function Work() {
     return (
         <section id="work" className="section-fade">
             <AnimatedSection><div className="section-tag">Selected work</div></AnimatedSection>
-            <AnimatedSection delay={0.1}><h2>Results that ship to production.</h2></AnimatedSection>
-            <AnimatedSection delay={0.15}><p className="section-sub">A selection of how we operate. Clients stay confidential. The outcomes are real.</p></AnimatedSection>
+            <AnimatedSection delay={0.1}><h2>A selection of how we operate. Clients stay confidential. The outcomes are real.</h2></AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <div className="work-grid">
                     {CASES.map((c) => (
