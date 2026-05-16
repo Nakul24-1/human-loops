@@ -425,20 +425,196 @@ section h2 {
   background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
 }
 
-/* ---------- POSITIONING (How we are different — 4 cards) ---------- */
-.pos-grid {
+/* ---------- POSITIONING (How we are different — asymmetric bento) ---------- */
+.pos-bento {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: 1.15fr 1.5fr 1fr;
+  grid-auto-rows: minmax(220px, auto);
+  gap: 18px;
   margin-top: 16px;
 }
 
-.pos-num {
-  font-size: 13px;
-  color: var(--primary);
+/* Card 01 — tall featured (left, spans both rows) */
+.pos-card-1 {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 36px 32px;
+}
+
+.pos-card-1 .pos-title {
+  font-size: 28px;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+.pos-card-1 .pos-text {
+  font-size: 15px;
+}
+
+/* Output-format chips row */
+.pos-chips-label {
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-weight: 700;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.pos-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pos-chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--foreground);
+  background: rgb(var(--ink) / 0.03);
+  font-family: var(--font-dm-sans), monospace;
+}
+
+/* Flow track diagram */
+.pos-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.pos-track-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.pos-track-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 4px rgb(166 228 14 / 0.12);
+  margin-bottom: 6px;
+}
+
+.pos-track-label {
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-weight: 600;
+}
+
+.pos-track-line {
+  position: absolute;
+  top: 4px;
+  left: calc(50% + 14px);
+  height: 1px;
+  width: calc(100% + 24px);
+  background: var(--line);
+  z-index: 0;
+}
+
+/* Card 02 — wide top right with stat callout */
+.pos-card-2 {
+  grid-column: 2 / span 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  padding: 32px 36px;
+}
+
+.pos-card-2 .pos-title {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.pos-card-2-body {
+  min-width: 0;
+}
+
+.pos-callout {
+  flex-shrink: 0;
+  padding: 18px 24px;
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 140px;
+}
+
+.pos-callout-num {
+  font-size: 32px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: -1.2px;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.pos-callout-label {
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.pos-callout-divider {
+  width: 28px;
+  height: 1px;
+  background: var(--line);
+  margin: 6px 0;
+}
+
+/* Card 03 — bottom middle */
+.pos-card-3 {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 28px 28px;
+}
+
+/* Card 04 — bottom right with mini chips */
+.pos-card-4 {
+  grid-column: 3;
+  grid-row: 2;
+  padding: 28px 26px;
+}
+
+.pos-mini-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
   margin-bottom: 14px;
+}
+
+.pos-mini-chips span {
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  padding: 4px 9px;
+  border-radius: 100px;
+  color: var(--primary);
+  background: rgb(166 228 14 / 0.10);
+  border: 1px solid rgb(166 228 14 / 0.30);
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .pos-title {
@@ -460,6 +636,25 @@ section h2 {
 .pos-text strong {
   color: var(--foreground);
   font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .pos-bento {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+  }
+  .pos-card-1 { grid-column: 1 / span 2; grid-row: auto; }
+  .pos-card-2 { grid-column: 1 / span 2; grid-row: auto; grid-template-columns: 1fr; gap: 18px; }
+  .pos-card-2 .pos-callout { border-left: none; border-top: 1px solid var(--line); padding: 18px 0 0; flex-direction: row; align-items: baseline; gap: 12px; }
+  .pos-card-2 .pos-callout-divider { width: 1px; height: 24px; margin: 0 4px; }
+  .pos-card-3 { grid-column: 1; grid-row: auto; }
+  .pos-card-4 { grid-column: 2; grid-row: auto; }
+}
+
+@media (max-width: 640px) {
+  .pos-bento { grid-template-columns: 1fr; }
+  .pos-card-1, .pos-card-2, .pos-card-3, .pos-card-4 { grid-column: 1; }
+  .pos-track-label { font-size: 9px; }
 }
 
 /* ---------- SERVICES (BGA-style accordion) ---------- */
@@ -1101,9 +1296,6 @@ section h2 {
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 1200px) {
-  .pos-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .svc-accordion {
     grid-template-columns: 1fr;
   }
@@ -1193,11 +1385,6 @@ section h2 {
     padding: 12px 16px;
     font-size: 9px;
     letter-spacing: 1.5px;
-  }
-
-  .pos-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
   }
 
   .card {
