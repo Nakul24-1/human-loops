@@ -16,7 +16,8 @@
   /* Semantic colors */
   --background: rgb(var(--paper));
   --foreground: rgb(var(--ink));
-  --muted-foreground: rgb(var(--ink) / 0.58);
+  /* Body text in light: very dark gray (~88% ink). Readable on #FAFAFA, still distinct from headlines. */
+  --muted-foreground: #2A2826;
   --muted: rgb(var(--ink) / 0.04);
 
   /* Inverse — for buttons/chips that stay flipped relative to bg */
@@ -58,7 +59,8 @@
   --paper: 10 10 11;        /* near-black #0A0A0B */
   --surface: 17 17 20;      /* #111114 */
 
-  --muted-foreground: rgb(var(--ink) / 0.60);
+  /* Body text in dark: bright near-white, NOT a middle gray. Readable on #0A0A0B. */
+  --muted-foreground: #D8D8D5;
 
   --primary: #A6E40E;       /* bright lime on dark — high contrast */
   --primary-foreground: #0A1A02;
