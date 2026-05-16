@@ -16,8 +16,7 @@ export default function Careers() {
     return (
         <section id="careers">
             <AnimatedSection><div className="section-tag">Careers</div></AnimatedSection>
-            <AnimatedSection delay={0.1}><h2>Join our team.</h2></AnimatedSection>
-            <AnimatedSection delay={0.15}><p className="section-sub">Detail-obsessed operators who want to work at the frontier of AI and the physical world. All roles are full time, on site, in Nagpur.</p></AnimatedSection>
+            <AnimatedSection delay={0.1}><h2>Detail-obsessed operators who want to work at the frontier of AI and the physical world. All roles are full time, on site, in Nagpur.</h2></AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <div className="jobs-grid">
                     {JOBS.map((j, i) => (

@@ -28,8 +28,8 @@ const CARDS = [
 export default function Positioning() {
     return (
         <section id="how">
-            <AnimatedSection><div className="section-tag">Why teams pick us</div></AnimatedSection>
-            <AnimatedSection delay={0.1}><h2>How we are different.</h2></AnimatedSection>
+            <AnimatedSection><div className="section-tag">How we differ</div></AnimatedSection>
+            <AnimatedSection delay={0.1}><h2>Why robotics and Physical AI teams pick Human Loops over a generalist data vendor.</h2></AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <div className="pos-grid">
                     {CARDS.map((c, i) => (
